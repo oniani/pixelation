@@ -18,8 +18,8 @@ class App:
         self.cloud_x2 = 0 # Starting x coordinate for the cloud 2
         self.loop_1 = False # Do not use reset cloud
         self.loop_2 = False # Do not use reset cloud
-        self.go_into_loop1 = True # Check whether x coordinate is greated than the limit
-        self.go_into_loop2 = True # Check whether x coordinate is greated than the limit
+        self.go_into_loop_1 = True # Check whether x coordinate is greated than the limit
+        self.go_into_loop_2 = True # Check whether x coordinate is greated than the limit
         # Character stuff
         self.x = 0
         self.y = 0
@@ -28,7 +28,7 @@ class App:
         ########################
         self.velocity = 0
         self.acceleration = 0.25
-        self.jump_height = 30 # Jump height
+        self.jump_height = 25 # Jump height
         self.is_jumping = False # Variable declaration, for jumping
         self.jump_num = 0 # How many times did it jump?
         ########################
@@ -102,17 +102,17 @@ class App:
         """
         Draw clouds on the screen
         """
-        if self.go_into_loop1:
+        if self.go_into_loop_1:
             if self.cloud_x1 > 99:
                 self.loop_1 = True
                 self.cloud_x1 = 0
-                self.go_into_loop1 = False
+                self.go_into_loop_1 = False
 
-        if self.go_into_loop2:
+        if self.go_into_loop_2:
             if self.cloud_x2 > 49:
                 self.loop_2 = True
                 self.cloud_x2 = 0
-                self.go_into_loop2 = False
+                self.go_into_loop_2 = False
 
         self.cloud(self.cloud_x0)
         
@@ -130,30 +130,39 @@ class App:
         """
         Draw the ground
         """
-        pyxel.rect(0, 100, 240, 120, 3)
+        pyxel.rect(0, 110, 150, 120, 3)
     
     def hero(self):
         """
         Draw the hero
-
-        For implementing the jump, I'll probably need to do the for loop
-        with big range to ensure all the pixels move along and eyes do not
-        detect the movement
         """
-        pyxel.circ(10 + self.x, 82 + self.y, 3, 12)
-        # pyxel.rect(11.5 + self.x, 82 + self.y, 13 + self.x, 83 + self.y, 12)
+        pyxel.circ(10 + self.x, 77 + self.y, 4, 12)                           # Head
+        pyxel.circ(8 + self.x, 77 + self.y, 0.25, 4)                          # Left Eye  0
+        pyxel.circ(9 + self.x, 77 + self.y, 0.25, 4)                          # Left Eye  1
+        pyxel.circ(12 + self.x, 77 + self.y, 0.25, 4)                         # Right Eye 0
+        pyxel.circ(13 + self.x, 77 + self.y, 0.25, 4)                         # Right Eye 1
+        pyxel.rect(9.5 + self.x, 80 + self.y, 11 + self.x, 80 + self.y, 4)    # :|
+        pyxel.rect(8 + self.x, 82 + self.y, 11.5 + self.x, 90 + self.y, 12)   # Body        
+        for i in range(25):
+            pyxel.rect(9.71 + self.x + 0.25*i, 87 + self.y + 0.25*i, 9.81 + self.x + 0.25*i, 92 + self.y + 0.25*i, 12)  # Right Leg
+            pyxel.rect(9.71 + self.x - 0.25*i, 87 + self.y + 0.25*i, 9.81 + self.x - 0.25*i, 92 + self.y + 0.25*i, 12)  # Left Leg
 
     def jump(self):
         """
         Jump implementation
+
+        Note: We do not have accelerations
+        on both axes since the jump is vertical
+        that is the degree between the jump trajectory
+        and the X axis is constant and equals π radians
         """
         self.jump_num += 1
-        # Smooth "go-up" implementation for the jump
+        # Up
         if self.jump_num <= self.jump_height:
             self.velocity = 1
             self.y -= self.velocity
             self.velocity += self.acceleration
-        # Smooth "go-down" implementation for the jump
+        # Down
         elif self.jump_num > self.jump_height:
             if self.y != 0:
                 self.velocity = 1 
@@ -175,9 +184,12 @@ class App:
         Making sure that everything
         is within the borders
         """
-        if self.x + 10 > 240:
+        if self.x + 10 > 150:
             self.x = 0
+        elif self.x < 0:
+            self.x = 140
         elif self.y + 82 > 120:
             self.y = 0
+
 
 App()
