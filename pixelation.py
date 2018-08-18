@@ -9,8 +9,8 @@ class App:
         self.elapsed_time = 0
         ###################
         self.run = False
-        self.block_x = 0
-        self.block_y = 50
+        self.bullet_x = 0
+        self.bullet_y = 0
         # Variables for clouds
         self.cloud_x0 = 0 # Starting x coordinate for the cloud 0
         self.cloud_x1 = 0 # Starting x coordinate for the cloud 1
@@ -22,12 +22,13 @@ class App:
         # Character stuff
         self.x = 0
         self.y = 0
+        self.static_x = 0
         ########################
         #######JUMP STUFF#######
         ########################
         self.velocity = 0
         self.acceleration = 0.5
-        self.jump_height = 25 # Jump height
+        self.jump_height = 20 # Jump height
         self.is_jumping = False # Variable declaration, for jumping
         self.jump_num = 0 # How many times did it jump?
         ########################
@@ -55,7 +56,7 @@ class App:
             self.cloud_x1 = (self.cloud_x1 + 1.25) % pyxel.width
             self.cloud_x2 = (self.cloud_x2 + 1.25) % pyxel.width
 
-            self.block_x = (self.block_x + 1.5) % pyxel.width # Moving blocks
+            self.bullet_y = (self.bullet_y + 3) % pyxel.width # Moving blocks
             
             self.constraints() # Constraints
 
@@ -70,12 +71,16 @@ class App:
                 # self.y += 1
             elif pyxel.btn(pyxel.KEY_SPACE):
                 self.is_shooting = True
+                self.static_x = self.x
             elif pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
             
             # Jump
             if self.is_jumping:
                 self.jump()
+            
+            # Shoot
+            self.shoot()
             
             # print(self.x) # Print the horizontal coordinate every update
             # print(self.y) # Print the vertical coordinate every update
@@ -89,8 +94,8 @@ class App:
         self.clouds()
         self.ground()
         self.hero()
-        pyxel.rect(self.block_x, self.block_y, self.block_x + 7, self.block_y + 5, 4)
-
+        self.shoot()
+    
     def welcome(self):
         pyxel.text(45, 50, "Welcome to Pixelation!", pyxel.frame_count % 16)
 
@@ -111,7 +116,7 @@ class App:
         #########################################################
         # print(self.elapsed_time)                                        #
         # if self.elapsed_time >= 0.005: # Start shooting after 5 seconds #
-        self.cloud_shooting(x) # Enable rainy clouds        #
+        # self.cloud_shooting(x) # Enable rainy clouds        #
         #########################################################
 
     def cloud_shooting(self, x):
@@ -168,13 +173,13 @@ class App:
         Draw clouds on the screen
         """
         if self.go_into_loop_1:
-            if self.cloud_x1 > 129:
+            if self.cloud_x1 > 119:
                 self.loop_1 = True
                 self.cloud_x1 = 0
                 self.go_into_loop_1 = False
 
         if self.go_into_loop_2:
-            if self.cloud_x2 > 79:
+            if self.cloud_x2 > 59:
                 self.loop_2 = True
                 self.cloud_x2 = 0
                 self.go_into_loop_2 = False
@@ -221,6 +226,12 @@ class App:
         pyxel.circ(12.5 + self.x, 104.5 + self.y, 0.25, 4)   # Smile Right
         pyxel.circ(11.5 + self.x, 105.5 + self.y, 0.25, 4)   # Smile Right
 
+    def shoot(self):
+        if self.is_shooting:
+            if 110 - self.bullet_y <= 0:
+                self.is_shooting = False
+            pyxel.rect(10 + self.static_x, 108 - self.bullet_y, 10 + self.static_x, 110 - self.bullet_y, 4)
+
     def jump(self):
         """
         Jump implementation
@@ -246,12 +257,6 @@ class App:
                 self.is_jumping = False
                 self.velocity = 0
                 self.jump_num = 0
-    
-    # def shoot(self):
-    #     """
-    #     Shoot bad guys LUL
-    #     """
-    #     self.is_shooting = True
 
     def constraints(self):
         """
