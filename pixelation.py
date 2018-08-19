@@ -30,15 +30,15 @@ class App:
         self.is_jumping = False   # Variable declaration, for jumping
         self.jump_num = 0         # How many times did it jump?
 
-        # Bullet variables
-        self.bullet_x = 0
-        self.bullet_y = 0
+        # Laser variables
         self.is_shooting = False
+        self.laser_timer = 0
 
         pyxel.run(self.update, self.draw)
 
     def update(self):
         start_time = time.time()
+
         if pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
         elif pyxel.btn(pyxel.KEY_ENTER):
@@ -49,8 +49,6 @@ class App:
             self.cloud_x0 = (self.cloud_x0 + 1.25) % pyxel.width
             self.cloud_x1 = (self.cloud_x1 + 1.25) % pyxel.width
             self.cloud_x2 = (self.cloud_x2 + 1.25) % pyxel.width
-
-            self.bullet_y = (self.bullet_y + 3) % pyxel.width
             
             self.constraints() # Constraints
 
@@ -61,15 +59,10 @@ class App:
                 self.x += 1
             elif pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_W):
                 self.is_jumping = True
-            elif pyxel.btn(pyxel.KEY_SPACE):
+            elif pyxel.btnp(pyxel.KEY_SPACE):
                 self.is_shooting = True
-                self.bullet_x = self.x
             elif pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
-            
-            # Jump
-            if self.is_jumping:
-                self.jump()
             
             end_time = time.time()
             self.elapsed_time += end_time - start_time
@@ -80,7 +73,8 @@ class App:
         self.clouds()
         self.ground()
         self.hero()
-        self.shoot()
+        self.jump()
+        self.laser()
 
     # Environment and elements functions starting here
     def welcome(self):
@@ -107,51 +101,35 @@ class App:
     def cloud_shooting(self, x):
         # Cloud shooting animations
         # Cycle 1 ~ Stage 1
-        # Cloud 0
-        pyxel.rect(20 + x/5, 20 + x, 20.05 + x/5, 22 + x, 2)
-        pyxel.rect(30 + x/5, 20 + x, 30.05 + x/5, 22 + x, 2)
-        pyxel.rect(40 + x/5, 20 + x, 40.05 + x/5, 22 + x, 2)
-        # Cloud 4
-        pyxel.rect(80 + x/5, 20 + x, 80.05 + x/5, 22 + x, 2)
-        pyxel.rect(90 + x/5, 20 + x, 90.05 + x/5, 22 + x, 2)
-        pyxel.rect(100 + x/5, 20 + x, 100.05 + x/5, 22 + x, 2)
-        # Cloud
-        pyxel.rect(140 + x/5, 20 + x, 140.05 + x/5, 22 + x, 2)
-        pyxel.rect(150 + x/5, 20 + x, 150.05 + x/5, 22 + x, 2)
-        pyxel.rect(160 + x/5, 20 + x, 160.05 + x/5, 22 + x, 2)
+        def stage_1():
+            pyxel.rect(20 + x/5, 20 + x, 20.05 + x/5, 22 + x, 2)
+            pyxel.rect(30 + x/5, 20 + x, 30.05 + x/5, 22 + x, 2)
+            pyxel.rect(40 + x/5, 20 + x, 40.05 + x/5, 22 + x, 2)
+            
+            pyxel.rect(80 + x/5, 20 + x, 80.05 + x/5, 22 + x, 2)
+            pyxel.rect(90 + x/5, 20 + x, 90.05 + x/5, 22 + x, 2)
+            pyxel.rect(100 + x/5, 20 + x, 100.05 + x/5, 22 + x, 2)
+            
+            pyxel.rect(140 + x/5, 20 + x, 140.05 + x/5, 22 + x, 2)
+            pyxel.rect(150 + x/5, 20 + x, 150.05 + x/5, 22 + x, 2)
+            pyxel.rect(160 + x/5, 20 + x, 160.05 + x/5, 22 + x, 2)
 
+        def stage_2():
         # Cycle 2 ~ Stage 2
-        # Cloud 0
-        # pyxel.rect(20 - x/5, 20 + x, 20.25 - x/5, 20 + x, 12)
-        # pyxel.rect(30 - x/5, 20 + x, 30.25 - x/5, 20 + x, 12)
-        # pyxel.rect(40 - x/5, 20 + x, 40.25 - x/5, 20 + x, 12)
-        # # Cloud 1
-        # pyxel.rect(60 - x/5, 20 + x, 60.25 - x/5, 20 + x, 12)
-        # pyxel.rect(70 - x/5, 20 + x, 70.25 - x/5, 20 + x, 12)
-        # pyxel.rect(80 - x/5, 20 + x, 80.25 - x/5, 20 + x, 12)
-        # # Cloud 2
-        # pyxel.rect(100 - x/5, 20 + x, 100.25 - x/5, 20 + x, 12)
-        # pyxel.rect(110 - x/5, 20 + x, 110.25 - x/5, 20 + x, 12)
-        # pyxel.rect(120 - x/5, 20 + x, 120.25 - x/5, 20 + x, 12)
-
-        # # Cycle 3 ~ Stage 3
-        # # Cloud 0
-        # pyxel.rect(20, 20 + x/5, 20.25, 20 + x/5, 12)
-        # pyxel.rect(30, 20 + x/5, 30.25, 20 + x/5, 12)
-        # pyxel.rect(40, 20 + x/5, 40.25, 20 + x/5, 12)
-        # # Cloud 1
-        # pyxel.rect(60, 20 + x/5, 60.25, 20 + x/5, 12)
-        # pyxel.rect(70, 20 + x/5, 70.25, 20 + x/5, 12)
-        # pyxel.rect(80, 20 + x/5, 80.25, 20 + x/5, 12)
-        # # Cloud 2
-        # pyxel.rect(100, 20 + x/5, 100.25, 20 + x/5, 12)
-        # pyxel.rect(110, 20 + x/5, 110.25, 20 + x/5, 12)
-        # pyxel.rect(120, 20 + x/5, 120.25, 20 + x/5, 12)
-
-        # # Implement the collision (what happens? instanteneous death or -hp?)
-        # WILL NEED A FOOR LOOP TO ITERATE THROUGH ALL THE BODY POINTS OF THE HERO
-        # if [20.25 + x, 20 + x] == [10 + self.x, 90 + self.y]:
-        #     pyxel.quit()
+            pyxel.rect(20 - x/5, 20 + x, 20.05 - x/5, 22 + x, 2)
+            pyxel.rect(30 - x/5, 20 + x, 30.05 - x/5, 22 + x, 2)
+            pyxel.rect(40 - x/5, 20 + x, 40.05 - x/5, 22 + x, 2)
+            
+            pyxel.rect(80 - x/5, 20 + x, 80.05 - x/5, 22 + x, 2)
+            pyxel.rect(90 - x/5, 20 + x, 90.05 - x/5, 22 + x, 2)
+            pyxel.rect(100 - x/5, 20 + x, 100.05 - x/5, 22 + x, 2)
+            
+            pyxel.rect(140 - x/5, 20 + x, 140.05 - x/5, 22 + x, 2)
+            pyxel.rect(150 - x/5, 20 + x, 150.05 - x/5, 22 + x, 2)
+            pyxel.rect(160 - x/5, 20 + x, 160.05 - x/5, 22 + x, 2)
+        
+        stage_1()
+        # stage_2()
 
     def clouds(self):
         """
@@ -203,15 +181,15 @@ class App:
         pyxel.circ(12   + self.x, 100.5 + self.y, 0.25, 12)   # Right Eye 1
         pyxel.circ(12   + self.x, 101.5 + self.y, 0.25, 12)   # Right Eye 2
 
-        pyxel.circ(6    + self.x, 103.5 + self.y, 0.25, 4)   # Smile Left
-        pyxel.circ(7    + self.x, 104.5 + self.y, 0.25, 4)   # Smile Left
-        pyxel.circ(8    + self.x, 105.5 + self.y, 0.25, 4)   # Smile Left
-        pyxel.circ(11   + self.x, 105.5 + self.y, 0.25, 4)   # Smile Center
-        pyxel.circ(10   + self.x, 105.5 + self.y, 0.25, 4)   # Smile Center
-        pyxel.circ(8.5  + self.x, 105.5 + self.y, 0.25, 4)   # Smile Center
-        pyxel.circ(13.5 + self.x, 103.5 + self.y, 0.25, 4)   # Smile Right
-        pyxel.circ(12.5 + self.x, 104.5 + self.y, 0.25, 4)   # Smile Right
-        pyxel.circ(11.5 + self.x, 105.5 + self.y, 0.25, 4)   # Smile Right
+        pyxel.circ(6    + self.x, 103.5 + self.y, 0.25, 4)    # Smile Left
+        pyxel.circ(7    + self.x, 104.5 + self.y, 0.25, 4)    # Smile Left
+        pyxel.circ(8    + self.x, 105.5 + self.y, 0.25, 4)    # Smile Left
+        pyxel.circ(11   + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
+        pyxel.circ(10   + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
+        pyxel.circ(8.5  + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
+        pyxel.circ(13.5 + self.x, 103.5 + self.y, 0.25, 4)    # Smile Right
+        pyxel.circ(12.5 + self.x, 104.5 + self.y, 0.25, 4)    # Smile Right
+        pyxel.circ(11.5 + self.x, 105.5 + self.y, 0.25, 4)    # Smile Right
 
     def jump(self):
         """
@@ -222,27 +200,32 @@ class App:
         that is the degree between the jump trajectory
         and the X axis is constant and equals π radians
         """
-        self.jump_num += 1
-        # Up
-        if self.jump_num <= self.jump_height:
-            self.velocity = 1.5
-            self.y -= self.velocity
-        # Down
-        elif self.jump_num > self.jump_height:
-            if self.y != 0:
+        if self.is_jumping:
+            self.jump_num += 1
+            # Up
+            if self.jump_num <= self.jump_height:
                 self.velocity = 1.5
-                self.y += self.velocity
-            else:
-                self.is_jumping = False
-                self.velocity = 0
-                self.jump_num = 0
+                self.y -= self.velocity
+            # Down
+            elif self.jump_num > self.jump_height:
+                if self.y != 0:
+                    self.velocity = 1.5
+                    self.y += self.velocity
+                else:
+                    self.is_jumping = False
+                    self.velocity = 0
+                    self.jump_num = 0
 
-    def shoot(self):
+    def laser(self):
         if self.is_shooting:
-            if self.bullet_y == 177:
+            start = time.time()
+            pyxel.rect(8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8)
+            end = time.time()
+            self.laser_timer += end - start
+
+            if self.laser_timer > 0.0003:
                 self.is_shooting = False
-            
-            pyxel.rect(10 + self.bullet_x, 107 - self.bullet_y, 10 + self.bullet_x, 111 - self.bullet_y, 4)
+                self.laser_timer = 0
 
     def constraints(self):
         """
