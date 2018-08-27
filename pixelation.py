@@ -23,6 +23,7 @@ class App:
         # Character stuff
         self.x = 0
         self.y = 0
+        self.score = 0
 
         # Jump variables
         self.velocity = 0         # Increment velocity
@@ -61,6 +62,7 @@ class App:
                 self.is_jumping = True
             elif pyxel.btnp(pyxel.KEY_SPACE):
                 self.is_shooting = True
+                self.score += 1
             elif pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
             
@@ -75,6 +77,9 @@ class App:
         self.hero()
         self.jump()
         self.laser()
+        s = 'SCORE {:>1}'.format(self.score)
+        pyxel.text(150, 5, s, 1)
+        pyxel.text(150, 4, s, 7)
 
     # Environment and elements functions starting here
     def welcome(self):
@@ -226,6 +231,10 @@ class App:
             if self.laser_timer > 0.0003:
                 self.is_shooting = False
                 self.laser_timer = 0
+            
+            # Score +1 if clouds get hit :: to be implemented
+            # if self.y == 20 + x and 12 + self.x == :
+            #     self.score += 1
 
     def constraints(self):
         """
