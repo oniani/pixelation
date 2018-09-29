@@ -3,22 +3,24 @@ import random
 import time
 
 
-class App:
+class Pixelation:
     def __init__(self):
         pyxel.init(180, 120, caption="Pixelation")
-        # pyxel.image(0).load(0, 0, '1.png')
         # Global variables
         self.elapsed_time = 0
         self.run = False
 
         # Variables for clouds
-        self.cloud_x0 = 0 # Starting x coordinate for the cloud 0
-        self.cloud_x1 = 0 # Starting x coordinate for the cloud 1
-        self.cloud_x2 = 0 # Starting x coordinate for the cloud 2
-        self.loop_1 = False # Do not use reset cloud
-        self.loop_2 = False # Do not use reset cloud
-        self.go_into_loop_1 = True # Check whether x coordinate is greated than the limit
-        self.go_into_loop_2 = True # Check whether x coordinate is greated than the limit
+        self.cloud_x0 = 0             # Starting x coordinate for the cloud 0
+        self.cloud_x1 = 0             # Starting x coordinate for the cloud 1
+        self.cloud_x2 = 0             # Starting x coordinate for the cloud 2
+        self.loop_1 = False           # Do not use reset cloud
+        self.loop_2 = False           # Do not use reset cloud
+        self.go_into_loop_1 = True    # Check whether x coordinate is greated than the limit
+        self.go_into_loop_2 = True    # Check whether x coordinate is greated than the limit
+        self.cloud1_health = 0        # Health of the first cloud 
+        self.cloud2_health = 0        # Health of the second cloud
+        self.cloud3_health = 0        # Health of the third cloud
 
         # Character stuff
         self.x = 0
@@ -31,9 +33,9 @@ class App:
         self.is_jumping = False   # Variable declaration, for jumping
         self.jump_num = 0         # How many times did it jump?
 
-        # Laser variables
+        # Laser beam variables
         self.is_shooting = False
-        self.laser_timer = 0
+        self.laser_beam_timer = 0
 
         pyxel.run(self.update, self.draw)
 
@@ -76,7 +78,7 @@ class App:
         self.ground()
         self.hero()
         self.jump()
-        self.laser()
+        self.laser_beam()
         s = 'SCORE {:>1}'.format(self.score)
         pyxel.text(150, 5, s, 1)
         pyxel.text(150, 4, s, 7)
@@ -176,21 +178,21 @@ class App:
         """
         Draw the hero
         """
-        pyxel.circ(10 + self.x, 102 + self.y, 7, 7)         # Head
+        pyxel.circ(10 + self.x, 102 + self.y, 7, 7)           # Head
 
-        pyxel.circ(8    + self.x, 99.5  + self.y, 0.25, 12)   # Left Eye  0
-        pyxel.circ(8    + self.x, 100.5 + self.y, 0.25, 12)   # Left Eye  1
-        pyxel.circ(8    + self.x, 101.5 + self.y, 0.25, 12)   # Left Eye  2
+        pyxel.circ(8 + self.x, 99.5  + self.y, 0.25, 12)      # Left Eye  0
+        pyxel.circ(8 + self.x, 100.5 + self.y, 0.25, 12)      # Left Eye  1
+        pyxel.circ(8 + self.x, 101.5 + self.y, 0.25, 12)      # Left Eye  2
 
-        pyxel.circ(12   + self.x, 99.5  + self.y, 0.25, 12)   # Right Eye 0
-        pyxel.circ(12   + self.x, 100.5 + self.y, 0.25, 12)   # Right Eye 1
-        pyxel.circ(12   + self.x, 101.5 + self.y, 0.25, 12)   # Right Eye 2
+        pyxel.circ(12 + self.x, 99.5  + self.y, 0.25, 12)     # Right Eye 0
+        pyxel.circ(12 + self.x, 100.5 + self.y, 0.25, 12)     # Right Eye 1
+        pyxel.circ(12 + self.x, 101.5 + self.y, 0.25, 12)     # Right Eye 2
 
-        pyxel.circ(6    + self.x, 103.5 + self.y, 0.25, 4)    # Smile Left
-        pyxel.circ(7    + self.x, 104.5 + self.y, 0.25, 4)    # Smile Left
-        pyxel.circ(8    + self.x, 105.5 + self.y, 0.25, 4)    # Smile Left
-        pyxel.circ(11   + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
-        pyxel.circ(10   + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
+        pyxel.circ(6 + self.x, 103.5 + self.y, 0.25, 4)       # Smile Left
+        pyxel.circ(7 + self.x, 104.5 + self.y, 0.25, 4)       # Smile Left
+        pyxel.circ(8 + self.x, 105.5 + self.y, 0.25, 4)       # Smile Left
+        pyxel.circ(11 + self.x, 105.5 + self.y, 0.25, 4)      # Smile Center
+        pyxel.circ(10 + self.x, 105.5 + self.y, 0.25, 4)      # Smile Center
         pyxel.circ(8.5  + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
         pyxel.circ(13.5 + self.x, 103.5 + self.y, 0.25, 4)    # Smile Right
         pyxel.circ(12.5 + self.x, 104.5 + self.y, 0.25, 4)    # Smile Right
@@ -221,17 +223,18 @@ class App:
                     self.velocity = 0
                     self.jump_num = 0
 
-    def laser(self):
+    def laser_beam(self):
         if self.is_shooting:
             start = time.time()
             pyxel.rect(8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8)
             end = time.time()
-            self.laser_timer += end - start
+            self.laser_beam_timer += end - start
 
-            if self.laser_timer > 0.0003:
+            if self.laser_beam_timer > 0.0003:
                 self.is_shooting = False
-                self.laser_timer = 0
-            
+                self.laser_beam_timer = 0
+            print(8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8)
+            return [8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8]
             # Score +1 if clouds get hit :: to be implemented
             # if self.y == 20 + x and 12 + self.x == :
             #     self.score += 1
@@ -249,4 +252,9 @@ class App:
             self.y = 0
 
 
-App()
+def main():
+    Pixelation()
+
+
+if __name__ == "__main__":
+    main()
