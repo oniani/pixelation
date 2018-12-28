@@ -1,94 +1,137 @@
+"""
+David Oniani
+Licensed under MIT
+
+                            P I X E L A T I O N
+
+This is a simple retro-style game where you have a hero which roams around
+and tries to avoid getting hit by raging clouds. If you get hit by the cloud,
+your score goes down by one. However, if you actually manage to hit the cloud
+with the laser beam, you will get awarded one point. Be sure to time the laser
+beam properly since there is a short delay before being able to reuse it again.
+
+Note that everything in the game is built manually using pixels. Therefore,
+every tiny particle has its own coordinates and could be manipulated directly.
+This flexibility, however, comes with the price which is hard work for calculating
+various measures of moving objects such as the width of cloud.
+
+The game is implemented using retro-style game engine for Python called Pyxel.
+For more information, see https://github.com/kitao/pyxel
+"""
+
+
+# Have to manually disable pylint for this project.
+# Otherwise, get pylint(E1101) warning.
+
+# pylint: disable-all
+
+
 import pyxel
-import random
 import time
 
 
 class Pixelation:
     def __init__(self):
         pyxel.init(180, 120, caption="Pixelation")
-        # Global variables
-        self.elapsed_time = 0
+        # Global environmental variables
+        self.start_time = time.time()
         self.run = False
 
         # Variables for clouds
-        self.cloud_x0 = 0             # Starting x coordinate for the cloud 0
-        self.cloud_x1 = 0             # Starting x coordinate for the cloud 1
-        self.cloud_x2 = 0             # Starting x coordinate for the cloud 2
-        self.loop_1 = False           # Do not use reset cloud
-        self.loop_2 = False           # Do not use reset cloud
-        self.go_into_loop_1 = True    # Check whether x coordinate is greated than the limit
-        self.go_into_loop_2 = True    # Check whether x coordinate is greated than the limit
-        self.cloud1_health = 0        # Health of the first cloud 
-        self.cloud2_health = 0        # Health of the second cloud
-        self.cloud3_health = 0        # Health of the third cloud
+        self.cloud0_x = 0           # Starting x coordinate for the cloud 0
+        self.cloud1_x = 0           # Starting x coordinate for the cloud 1
+        self.cloud2_x = 0           # Starting x coordinate for the cloud 2
+
+        self.loop_1 = False         # Do not use reset cloud
+        self.loop_2 = False         # Do not use reset cloud
+
+        self.go_into_loop_1 = True  # Check whether x coordinate is greated than the limit
+        self.go_into_loop_2 = True  # Check whether x coordinate is greated than the limit
+
+        self.cloud1_health = 0      # Health of the first cloud
+        self.cloud2_health = 0      # Health of the second cloud
+        self.cloud3_health = 0      # Health of the third cloud
 
         # Character stuff
-        self.x = 0
-        self.y = 0
-        self.score = 0
+        self.hero_x = 0
+        self.hero_y = 0
+        self.score  = 0
 
         # Jump variables
-        self.velocity = 0         # Increment velocity
+        self.velocity    = 0      # Increment velocity
         self.jump_height = 20     # Jump height
-        self.is_jumping = False   # Variable declaration, for jumping
-        self.jump_num = 0         # How many times did it jump?
+        self.is_jumping  = False  # Variable declaration, for jumping
+        self.jump_num    = 0      # How many times did it jump?
 
         # Laser beam variables
-        self.is_shooting = False
+        self.is_shooting      = False
         self.laser_beam_timer = 0
 
         pyxel.run(self.update, self.draw)
 
     def update(self):
-        start_time = time.time()
-
+        """
+        Update the environment.
+        """
         if pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
+
         elif pyxel.btn(pyxel.KEY_ENTER):
             self.run = True
 
         if self.run:
-            # Clouds
-            self.cloud_x0 = (self.cloud_x0 + 1.25) % pyxel.width
-            self.cloud_x1 = (self.cloud_x1 + 1.25) % pyxel.width
-            self.cloud_x2 = (self.cloud_x2 + 1.25) % pyxel.width
-            
-            self.constraints() # Constraints
+            self.cloud0_x = (self.cloud0_x + 1.25) % pyxel.width  # Cloud 0
+            self.cloud1_x = (self.cloud1_x + 1.25) % pyxel.width  # Cloud 1
+            self.cloud2_x = (self.cloud2_x + 1.25) % pyxel.width  # Cloud 2
+
+            self.constraints()  # Constraints
 
             # Character stuff
             if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_A):
-                self.x -= 1
+                self.hero_x -= 1
+
             elif pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.KEY_D):
-                self.x += 1
+                self.hero_x += 1
+
             elif pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_W):
                 self.is_jumping = True
+
             elif pyxel.btnp(pyxel.KEY_SPACE):
                 self.is_shooting = True
-                self.score += 1
+
             elif pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
-            
-            end_time = time.time()
-            self.elapsed_time += end_time - start_time
+
 
     def draw(self):
+        """
+        Draw the environment.
+        """
         pyxel.cls(13)
+
         self.welcome()
         self.clouds()
         self.ground()
         self.hero()
         self.jump()
         self.laser_beam()
-        s = 'SCORE {:>1}'.format(self.score)
-        pyxel.text(150, 5, s, 1)
-        pyxel.text(150, 4, s, 7)
 
-    # Environment and elements functions starting here
+        # Put the score in the upper-right corner
+        s = 'SCORE {:>1}'.format(self.score)
+        pyxel.text(145, 5, s, 1)
+        pyxel.text(145, 4, s, 7)
+
     def welcome(self):
+        """
+        Welcome text.
+        """
         if not self.run:
-            pyxel.text(45, 50, "Welcome to Pixelation!", pyxel.frame_count % 16)
+            pyxel.text(28, 50, "Welcome to P I X E L A T I O N!", pyxel.frame_count % 16)
 
     def cloud(self, x):
+        """
+        Cloud representation
+        """
         pyxel.circ(15 + x, 12, 5, 17)
         pyxel.circ(21 + x, 15, 5, 17)
         pyxel.circ(26 + x, 17, 5, 17)
@@ -101,155 +144,170 @@ class Pixelation:
         pyxel.circ(42 + x, 15, 5, 17)
         pyxel.circ(33 + x, 10, 5, 17)
 
-        # Code below is not functional, should fix it
-        # if self.elapsed_time >= 0.005: # Start shooting after 5 seconds
-        self.cloud_shooting(x) # Enable rainy clouds
+        # Start shooting after 3 seconds
+        if time.time() - self.start_time >= 3:
+            self.cloud_shooting(x)
 
     def cloud_shooting(self, x):
-        # Cloud shooting animations
-        # Cycle 1 ~ Stage 1
-        def stage_1():
-            pyxel.rect(20 + x/5, 20 + x, 20.05 + x/5, 22 + x, 2)
-            pyxel.rect(30 + x/5, 20 + x, 30.05 + x/5, 22 + x, 2)
-            pyxel.rect(40 + x/5, 20 + x, 40.05 + x/5, 22 + x, 2)
-            
-            pyxel.rect(80 + x/5, 20 + x, 80.05 + x/5, 22 + x, 2)
-            pyxel.rect(90 + x/5, 20 + x, 90.05 + x/5, 22 + x, 2)
-            pyxel.rect(100 + x/5, 20 + x, 100.05 + x/5, 22 + x, 2)
-            
-            pyxel.rect(140 + x/5, 20 + x, 140.05 + x/5, 22 + x, 2)
-            pyxel.rect(150 + x/5, 20 + x, 150.05 + x/5, 22 + x, 2)
-            pyxel.rect(160 + x/5, 20 + x, 160.05 + x/5, 22 + x, 2)
+        """
+        Cloud shooting animations.
+        """
+        pyxel.rect(20 + x / 5, 20 + x, 20.05 + x / 5, 22 + x, 2)
+        pyxel.rect(30 + x / 5, 20 + x, 30.05 + x / 5, 22 + x, 2)
+        pyxel.rect(40 + x / 5, 20 + x, 40.05 + x / 5, 22 + x, 2)
 
-        def stage_2():
-        # Cycle 2 ~ Stage 2
-            pyxel.rect(20 - x/5, 20 + x, 20.05 - x/5, 22 + x, 2)
-            pyxel.rect(30 - x/5, 20 + x, 30.05 - x/5, 22 + x, 2)
-            pyxel.rect(40 - x/5, 20 + x, 40.05 - x/5, 22 + x, 2)
-            
-            pyxel.rect(80 - x/5, 20 + x, 80.05 - x/5, 22 + x, 2)
-            pyxel.rect(90 - x/5, 20 + x, 90.05 - x/5, 22 + x, 2)
-            pyxel.rect(100 - x/5, 20 + x, 100.05 - x/5, 22 + x, 2)
-            
-            pyxel.rect(140 - x/5, 20 + x, 140.05 - x/5, 22 + x, 2)
-            pyxel.rect(150 - x/5, 20 + x, 150.05 - x/5, 22 + x, 2)
-            pyxel.rect(160 - x/5, 20 + x, 160.05 - x/5, 22 + x, 2)
-        
-        stage_1()
-        # stage_2()
+        pyxel.rect(80  + x / 5, 20 + x, 80.05  + x / 5, 22 + x, 2)
+        pyxel.rect(90  + x / 5, 20 + x, 90.05  + x / 5, 22 + x, 2)
+        pyxel.rect(100 + x / 5, 20 + x, 100.05 + x / 5, 22 + x, 2)
+
+        pyxel.rect(140 + x / 5, 20 + x, 140.05 + x / 5, 22 + x, 2)
+        pyxel.rect(150 + x / 5, 20 + x, 150.05 + x / 5, 22 + x, 2)
+        pyxel.rect(160 + x / 5, 20 + x, 160.05 + x / 5, 22 + x, 2)
 
     def clouds(self):
         """
         Draw clouds on the screen
         """
         if self.go_into_loop_1:
-            if self.cloud_x1 > 119:
+            if self.cloud1_x > 119:
                 self.loop_1 = True
-                self.cloud_x1 = 0
+                self.cloud1_x = 0
                 self.go_into_loop_1 = False
 
         if self.go_into_loop_2:
-            if self.cloud_x2 > 59:
+            if self.cloud2_x > 59:
                 self.loop_2 = True
-                self.cloud_x2 = 0
+                self.cloud2_x = 0
                 self.go_into_loop_2 = False
 
-        self.cloud(self.cloud_x0)
-        
+        self.cloud(self.cloud0_x)
+
         if self.loop_1:
-            self.cloud(self.cloud_x1) # reset
+            self.cloud(self.cloud1_x)  # reset
         else:
-            self.cloud(self.cloud_x1 + 60)
-        
+            self.cloud(self.cloud1_x + 60)
+
         if self.loop_2:
-            self.cloud(self.cloud_x2) # reset
+            self.cloud(self.cloud2_x)  # reset
         else:
-            self.cloud(self.cloud_x2 + 120)
+            self.cloud(self.cloud2_x + 120)
 
     def ground(self):
         """
         Draw the ground
         """
         pyxel.rect(0, 110, 180, 120, 2)
-    
+
 
     # Hero functions starting here
     def hero(self):
         """
         Draw the hero
         """
-        pyxel.circ(10 + self.x, 102 + self.y, 7, 7)           # Head
+        pyxel.circ(10 + self.hero_x, 102 + self.hero_y, 7, 7)         # Head
 
-        pyxel.circ(8 + self.x, 99.5  + self.y, 0.25, 12)      # Left Eye  0
-        pyxel.circ(8 + self.x, 100.5 + self.y, 0.25, 12)      # Left Eye  1
-        pyxel.circ(8 + self.x, 101.5 + self.y, 0.25, 12)      # Left Eye  2
+        pyxel.circ(8 + self.hero_x, 99.5  + self.hero_y, 0.25, 12)    # Left Eye  0
+        pyxel.circ(8 + self.hero_x, 100.5 + self.hero_y, 0.25, 12)    # Left Eye  1
+        pyxel.circ(8 + self.hero_x, 101.5 + self.hero_y, 0.25, 12)    # Left Eye  2
 
-        pyxel.circ(12 + self.x, 99.5  + self.y, 0.25, 12)     # Right Eye 0
-        pyxel.circ(12 + self.x, 100.5 + self.y, 0.25, 12)     # Right Eye 1
-        pyxel.circ(12 + self.x, 101.5 + self.y, 0.25, 12)     # Right Eye 2
+        pyxel.circ(12 + self.hero_x, 99.5  + self.hero_y, 0.25, 12)   # Right Eye 0
+        pyxel.circ(12 + self.hero_x, 100.5 + self.hero_y, 0.25, 12)   # Right Eye 1
+        pyxel.circ(12 + self.hero_x, 101.5 + self.hero_y, 0.25, 12)   # Right Eye 2
 
-        pyxel.circ(6 + self.x, 103.5 + self.y, 0.25, 4)       # Smile Left
-        pyxel.circ(7 + self.x, 104.5 + self.y, 0.25, 4)       # Smile Left
-        pyxel.circ(8 + self.x, 105.5 + self.y, 0.25, 4)       # Smile Left
-        pyxel.circ(11 + self.x, 105.5 + self.y, 0.25, 4)      # Smile Center
-        pyxel.circ(10 + self.x, 105.5 + self.y, 0.25, 4)      # Smile Center
-        pyxel.circ(8.5  + self.x, 105.5 + self.y, 0.25, 4)    # Smile Center
-        pyxel.circ(13.5 + self.x, 103.5 + self.y, 0.25, 4)    # Smile Right
-        pyxel.circ(12.5 + self.x, 104.5 + self.y, 0.25, 4)    # Smile Right
-        pyxel.circ(11.5 + self.x, 105.5 + self.y, 0.25, 4)    # Smile Right
+        pyxel.circ(6 + self.hero_x, 103.5 + self.hero_y, 0.25, 4)     # Smile Left
+        pyxel.circ(7 + self.hero_x, 104.5 + self.hero_y, 0.25, 4)     # Smile Left
+        pyxel.circ(8 + self.hero_x, 105.5 + self.hero_y, 0.25, 4)     # Smile Left
+
+        pyxel.circ(11   + self.hero_x, 105.5 + self.hero_y, 0.25, 4)  # Smile Center
+        pyxel.circ(10   + self.hero_x, 105.5 + self.hero_y, 0.25, 4)  # Smile Center
+        pyxel.circ(8.5  + self.hero_x, 105.5 + self.hero_y, 0.25, 4)  # Smile Center
+
+        pyxel.circ(13.5 + self.hero_x, 103.5 + self.hero_y, 0.25, 4)  # Smile Right
+        pyxel.circ(12.5 + self.hero_x, 104.5 + self.hero_y, 0.25, 4)  # Smile Right
+        pyxel.circ(11.5 + self.hero_x, 105.5 + self.hero_y, 0.25, 4)  # Smile Right
 
     def jump(self):
         """
         Jump implementation
-
-        Note: We do not have accelerations
-        on both axes since the jump is vertical
-        that is the degree between the jump trajectory
-        and the X axis is constant and equals π radians
         """
         if self.is_jumping:
             self.jump_num += 1
             # Up
             if self.jump_num <= self.jump_height:
                 self.velocity = 1.5
-                self.y -= self.velocity
+                self.hero_y -= self.velocity
             # Down
             elif self.jump_num > self.jump_height:
-                if self.y != 0:
+                if self.hero_y != 0:
                     self.velocity = 1.5
-                    self.y += self.velocity
+                    self.hero_y += self.velocity
                 else:
                     self.is_jumping = False
                     self.velocity = 0
                     self.jump_num = 0
 
     def laser_beam(self):
+        """
+        NOTE: FREEZE THE ENVIRONMENT FOR TESTING!
+        NOTE: Will have to account for annoying floating point errors.
+
+        A code for the laser beam.
+
+        +1 if hit the cloud!
+
+        Collision detection algorithm:
+
+        There are three possible cases.
+
+        I. Partial hit from the left
+            laser_left_x_cor < cloud_left_x_cor &&
+                (laser_right_x_cor >= cloud_left_x_cor
+                    && laser_right_x_cor < cloud_right_x_cor)
+
+        II.  Partial hit from the right
+            laser_right_x_cor < cloud_right_x_cor &&
+                (laser_left_x_cor >= cloud_right_x_cor
+                    && laser_left_x_cor < cloud_left_x_cor)
+
+        II. Full hit
+            laser_left_x_cor >= cloud_left_x_cor &&
+                laser_right_x_cor <= cloud_right_x_cor
+
+        No need to worry about the height since the beam goes all the way up.
+        """
         if self.is_shooting:
             start = time.time()
-            pyxel.rect(8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8)
+            pyxel.rect(8 + self.hero_x, 95 + self.hero_y, 12 + self.hero_x, 0 + self.hero_y, 8)
             end = time.time()
             self.laser_beam_timer += end - start
 
             if self.laser_beam_timer > 0.0003:
                 self.is_shooting = False
                 self.laser_beam_timer = 0
-            print(8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8)
-            return [8 + self.x, 95 + self.y, 12 + self.x, 0 + self.y, 8]
-            # Score +1 if clouds get hit :: to be implemented
-            # if self.y == 20 + x and 12 + self.x == :
-            #     self.score += 1
+
+            # There are three possi
+            # Note that after the first loop of clouds, things will normalize
+
+            # Case III: Full hit - Fix coordinates
+            if 8 + self.hero_x < self.cloud0_x and 12 + self.hero_x < self.cloud0_x + 30:
+                self.score += 1
+
+            # print(8 + self.hero_x, 95 + self.hero_y, 12 + self.hero_x, 0 + self.hero_y, 8)
+            # print(f"Zeroth: {self.cloud0_x}\nFirst: {self.cloud1_x}\nSecond: {self.cloud2_x}\n")
+            return [8 + self.hero_x, 95 + self.hero_y, 12 + self.hero_x, 0 + self.hero_y, 8]
 
     def constraints(self):
         """
-        Making sure that everything
-        is within the borders
+        Making sure that everything is within the borders.
         """
-        if self.x + 10 > 180:
-            self.x = 0
-        elif self.x < 0:
-            self.x = 170
-        elif self.y + 82 > 120:
-            self.y = 0
+        if self.hero_x + 10 > 180:
+            self.hero_x = 0
+
+        elif self.hero_x < 0:
+            self.hero_x = 170
+
+        elif self.hero_y + 82 > 120:
+            self.hero_y = 0
 
 
 def main():
