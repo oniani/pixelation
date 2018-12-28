@@ -6,8 +6,8 @@ Licensed under MIT
 
 This is a simple retro-style game where you have a hero which roams around
 and tries to avoid getting hit by raging clouds. If you get hit by the cloud,
-your score goes down by one. However, if you actually manage to hit the cloud
-with the laser beam, you will get awarded one point. Be sure to time the laser
+your score goes down, however, if you actually manage to hit the cloud
+with the laser beam, you will get awarded with points. Be sure to time the laser
 beam properly since there is a short delay before being able to reuse it again.
 
 Note that everything in the game is built manually using pixels. Therefore,
@@ -17,6 +17,11 @@ various measures of moving objects such as the width of cloud.
 
 The game is implemented using retro-style game engine for Python called Pyxel.
 For more information, see https://github.com/kitao/pyxel
+
+
+TODO:
+    1. Randomize the raindrops' behavior
+    3. Consider using numpy for pixels, maybe?
 """
 
 
@@ -102,7 +107,6 @@ class Pixelation:
             elif pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
 
-
     def draw(self):
         """
         Draw the environment.
@@ -118,8 +122,8 @@ class Pixelation:
 
         # Put the score in the upper-right corner
         s = 'SCORE {:>1}'.format(self.score)
-        pyxel.text(145, 5, s, 1)
-        pyxel.text(145, 4, s, 7)
+        pyxel.text(4, 5, s, 1)
+        pyxel.text(4, 4, s, 7)
 
     def welcome(self):
         """
@@ -131,6 +135,11 @@ class Pixelation:
     def cloud(self, x):
         """
         Cloud representation
+
+        It spans from (15 + x - 5 / 2) to (42 + x + 5 / 2)
+
+        In other words, the smallest x coordinate is 12.5 + x
+        and the biggest one is 44.5 + x
         """
         pyxel.circ(15 + x, 12, 5, 17)
         pyxel.circ(21 + x, 15, 5, 17)
@@ -254,26 +263,6 @@ class Pixelation:
         A code for the laser beam.
 
         +1 if hit the cloud!
-
-        Collision detection algorithm:
-
-        There are three possible cases.
-
-        I. Partial hit from the left
-            laser_left_x_cor < cloud_left_x_cor &&
-                (laser_right_x_cor >= cloud_left_x_cor
-                    && laser_right_x_cor < cloud_right_x_cor)
-
-        II.  Partial hit from the right
-            laser_right_x_cor < cloud_right_x_cor &&
-                (laser_left_x_cor >= cloud_right_x_cor
-                    && laser_left_x_cor < cloud_left_x_cor)
-
-        II. Full hit
-            laser_left_x_cor >= cloud_left_x_cor &&
-                laser_right_x_cor <= cloud_right_x_cor
-
-        No need to worry about the height since the beam goes all the way up.
         """
         if self.is_shooting:
             start = time.time()
@@ -284,17 +273,82 @@ class Pixelation:
             if self.laser_beam_timer > 0.0003:
                 self.is_shooting = False
                 self.laser_beam_timer = 0
-
-            # There are three possi
-            # Note that after the first loop of clouds, things will normalize
-
-            # Case III: Full hit - Fix coordinates
-            if 8 + self.hero_x < self.cloud0_x and 12 + self.hero_x < self.cloud0_x + 30:
+            
+            if self.detect_collision(8 + self.hero_x, 12 + self.hero_x, 12.5 + self.cloud0_x, self.cloud0_x + 44.5):
+                self.score += 1
+            
+            if self.detect_collision(8 + self.hero_x, 12 + self.hero_x, 12.5 + self.cloud1_x, self.cloud1_x + 44.5):
+                self.score += 1
+            
+            if self.detect_collision(8 + self.hero_x, 12 + self.hero_x, 12.5 + self.cloud2_x, self.cloud2_x + 44.5):
                 self.score += 1
 
-            # print(8 + self.hero_x, 95 + self.hero_y, 12 + self.hero_x, 0 + self.hero_y, 8)
-            # print(f"Zeroth: {self.cloud0_x}\nFirst: {self.cloud1_x}\nSecond: {self.cloud2_x}\n")
-            return [8 + self.hero_x, 95 + self.hero_y, 12 + self.hero_x, 0 + self.hero_y, 8]
+    def detect_collision(self, x_left_1, x_right_1, x_left_2, x_right_2):
+        """
+        Collision detection algorithm.
+
+        There are three possible cases.
+
+        I. Left side collision
+
+             ------------------
+         ____|_               |
+        |    | |              |
+        |    --|---------------
+        |      |
+        |      |
+        |______|
+            
+            if x_left_1 < x_left_2 and x_right_1 >= x_left_2
+
+        II. Right side collision
+
+        ------------------
+        |              __|___
+        |             |  |   |
+        ------------------   |
+                      |      |
+                      |      |
+                      |______|
+
+
+            if x_left_1 >= x_left_2 and x_right_1 > x_right_2
+
+        III. Full collision
+
+        ------------------
+        |    ______      |
+        |   |      |     |
+        ------------------
+            |      |
+            |      |
+            |______|
+
+
+            if x_left_1 >= x_left_2 and x_right_1 <= x_right_2
+
+
+        For the left and right side collision, we do not care about whether the
+        object's right x coordinate is greater than that of the other object.
+
+        NOTE: No need to worry about the height since the beam goes all the way up.
+        NOTE: Modifications to the inequalities are needed not to mingle the cases.
+            For instance, in the first case, if we do not impose the restriction
+            x_right_1 <= x_right_2, we get the third case.
+        """
+        # Case I
+        if x_left_1 < x_left_2 and (x_right_1 >= x_left_2 and x_right_1 <= x_right_2):
+            return True 
+
+        # Case II
+        if (x_left_1 >= x_left_2 and x_left_1 <= x_right_2) and x_right_1 > x_right_2:
+            return True
+
+        # Case III
+        if x_left_1 >= x_left_2 and x_right_1 <= x_right_2:
+            return True
+        
+        return False
 
     def constraints(self):
         """

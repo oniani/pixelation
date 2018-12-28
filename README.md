@@ -2,8 +2,8 @@
 
 This is a simple retro-style game where you have a hero which roams around
 and tries to avoid getting hit by raging clouds. If you get hit by the cloud,
-your score goes down by one. However, if you actually manage to hit the cloud
-with the laser beam, you will get awarded one point. Be sure to time the laser
+your score goes down, however, if you actually manage to hit the cloud
+with the laser beam, you will get awarded with points. Be sure to time the laser
 beam properly since there is a short delay before being able to reuse it again.
 
 Note that everything in the game is built manually using pixels. Therefore,
