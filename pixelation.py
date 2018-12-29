@@ -21,6 +21,7 @@ For more information, see https://github.com/kitao/pyxel
 
 TODO:
     1. Randomize the raindrops' behavior
+    2. Fix the raindrop hit behavior
     3. Consider using numpy for pixels, maybe?
 """
 
@@ -33,6 +34,7 @@ TODO:
 
 import pyxel
 import time
+import random
 
 
 class Pixelation:
@@ -42,7 +44,6 @@ class Pixelation:
         self.start_time = time.time()
         self.run = False
 
-        # Variables for clouds
         self.cloud0_x = 0           # Starting x coordinate for the cloud 0
         self.cloud1_x = 0           # Starting x coordinate for the cloud 1
         self.cloud2_x = 0           # Starting x coordinate for the cloud 2
@@ -53,9 +54,11 @@ class Pixelation:
         self.go_into_loop_1 = True  # Check whether x coordinate is greated than the limit
         self.go_into_loop_2 = True  # Check whether x coordinate is greated than the limit
 
-        self.cloud1_health = 0      # Health of the first cloud
-        self.cloud2_health = 0      # Health of the second cloud
-        self.cloud3_health = 0      # Health of the third cloud
+        self.rain0_x = 0            # Cloud 0 rain x coordinate
+        self.rain1_x = 0            # Cloud 1 rain x coordinate
+        self.rain2_x = 0            # Cloud 2 rain x coordinate
+
+        self.rain_coeff = 0         # Rain coefficient
 
         # Character stuff
         self.hero_x = 0
@@ -88,6 +91,10 @@ class Pixelation:
             self.cloud0_x = (self.cloud0_x + 1.25) % pyxel.width  # Cloud 0
             self.cloud1_x = (self.cloud1_x + 1.25) % pyxel.width  # Cloud 1
             self.cloud2_x = (self.cloud2_x + 1.25) % pyxel.width  # Cloud 2
+
+            self.rain0_x = (self.rain0_x + 1.75) % pyxel.width   # Cloud 0 laser
+            self.rain1_x = (self.rain1_x + 1.75) % pyxel.width   # Cloud 1 laser
+            self.rain2_x = (self.rain2_x + 1.75) % pyxel.width   # Cloud 2 laser
 
             self.constraints()  # Constraints
 
@@ -155,23 +162,43 @@ class Pixelation:
 
         # Start shooting after 3 seconds
         if time.time() - self.start_time >= 3:
-            self.cloud_shooting(x)
+            self.cloud_shooting()
 
-    def cloud_shooting(self, x):
+    def cloud_shooting(self):
         """
         Cloud shooting animations.
-        """
-        pyxel.rect(20 + x / 5, 20 + x, 20.05 + x / 5, 22 + x, 2)
-        pyxel.rect(30 + x / 5, 20 + x, 30.05 + x / 5, 22 + x, 2)
-        pyxel.rect(40 + x / 5, 20 + x, 40.05 + x / 5, 22 + x, 2)
 
-        pyxel.rect(80  + x / 5, 20 + x, 80.05  + x / 5, 22 + x, 2)
-        pyxel.rect(90  + x / 5, 20 + x, 90.05  + x / 5, 22 + x, 2)
-        pyxel.rect(100 + x / 5, 20 + x, 100.05 + x / 5, 22 + x, 2)
+        Hero:
+            x coordinate has the range: 7.875 + self.hero_x to 11.625 + self.hero_x
+            y coordinate has the range: 99.375 + self.hero_y to 105.625 + self.hero_y
+        """ 
+        # print("Height:", 40.05 + self.rain0_x / 5)  # approx 76
 
-        pyxel.rect(140 + x / 5, 20 + x, 140.05 + x / 5, 22 + x, 2)
-        pyxel.rect(150 + x / 5, 20 + x, 150.05 + x / 5, 22 + x, 2)
-        pyxel.rect(160 + x / 5, 20 + x, 160.05 + x / 5, 22 + x, 2)
+        if 40.05 + self.rain0_x / 5 > 75:
+            self.rain_coeff = random.uniform(1, 1.5)
+
+        x = 10 * self.rain_coeff
+
+        pyxel.rect(2 * x + self.rain0_x / 5, 20 + self.rain0_x, 2 * x + 0.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
+        pyxel.rect(3 * x + self.rain0_x / 5, 20 + self.rain0_x, 3 * x + 0.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
+        pyxel.rect(4 * x + self.rain0_x / 5, 20 + self.rain0_x, 4 * x + 0.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
+
+        pyxel.rect(8 * x  + self.rain1_x / 5, 20 + self.rain1_x, 8 * x + 0.05  + self.rain1_x / 5, 22 + self.rain1_x, 2)
+        pyxel.rect(9 * x  + self.rain1_x / 5, 20 + self.rain1_x, 9 * x + 0.05  + self.rain1_x / 5, 22 + self.rain1_x, 2)
+        pyxel.rect(10 * x + self.rain1_x / 5, 20 + self.rain1_x, 10 * x + 0.05 + self.rain1_x / 5, 22 + self.rain1_x, 2)
+
+        pyxel.rect(14 * x + self.rain2_x / 5, 20 + self.rain2_x, 14 * x + 0.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
+        pyxel.rect(15 * x + self.rain2_x / 5, 20 + self.rain2_x, 15 * x + 0.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
+        pyxel.rect(16 * x + self.rain2_x / 5, 20 + self.rain2_x, 16 * x + 0.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
+
+        # To detect the collision, we need to match the ranges of x and y coordinates
+        # print("Cloud 0 leftmost raindrop", 2 * x + self.rain0_x / 5, 2 * x + 0.05 + self.rain0_x / 5)
+        # print("Hero x coordinate range", 7.875 + self.hero_x, 11.625 + self.hero_x)
+
+        # We first detect the collision on the x-axis and then proceed by imposing restrictions on y-axis
+        # Ultimately, we will restrict horizontal and vertical spaces
+        if self.detect_collision(7.875 + self.hero_x, 11.625 + self.hero_x, 2 * x + self.rain0_x / 5, 2 * x + 0.05 + self.rain0_x / 5):
+            print("Placeholder")
 
     def clouds(self):
         """
@@ -192,12 +219,12 @@ class Pixelation:
         self.cloud(self.cloud0_x)
 
         if self.loop_1:
-            self.cloud(self.cloud1_x)  # reset
+            self.cloud(self.cloud1_x)  # Reset
         else:
             self.cloud(self.cloud1_x + 60)
 
         if self.loop_2:
-            self.cloud(self.cloud2_x)  # reset
+            self.cloud(self.cloud2_x)  # Reset
         else:
             self.cloud(self.cloud2_x + 120)
 
@@ -207,11 +234,12 @@ class Pixelation:
         """
         pyxel.rect(0, 110, 180, 120, 2)
 
-
-    # Hero functions starting here
     def hero(self):
         """
         Draw the hero
+
+        x coordinate has the range: 7.875 + self.hero_x to 11.625 + self.hero_x
+        y coordinate has the range: 99.375 + self.hero_y to 105.625 + self.hero_y
         """
         pyxel.circ(10 + self.hero_x, 102 + self.hero_y, 7, 7)         # Head
 
@@ -257,12 +285,7 @@ class Pixelation:
 
     def laser_beam(self):
         """
-        NOTE: FREEZE THE ENVIRONMENT FOR TESTING!
-        NOTE: Will have to account for annoying floating point errors.
-
-        A code for the laser beam.
-
-        +1 if hit the cloud!
+        Laser beam functionalities.
         """
         if self.is_shooting:
             start = time.time()
@@ -270,7 +293,7 @@ class Pixelation:
             end = time.time()
             self.laser_beam_timer += end - start
 
-            if self.laser_beam_timer > 0.0003:
+            if self.laser_beam_timer > 0.000075:
                 self.is_shooting = False
                 self.laser_beam_timer = 0
             
@@ -284,45 +307,50 @@ class Pixelation:
                 self.score += 1
 
     def detect_collision(self, x_left_1, x_right_1, x_left_2, x_right_2):
-        """
-        Collision detection algorithm.
+        """[Collision detection algorithm.]
+        
+        Arguments:
+            x_left_1  {[float]} -- [left, smaller, x coordinate for the first object]
+            x_right_1 {[float]} -- [right, bigger, x coordinate for the first object]
+            x_left_2  {[float]} -- [left, smaller, x coordinate for the second object]
+            x_right_2 {[float]} -- [right, bigger, x coordinate for the second object]
 
         There are three possible cases.
 
         I. Left side collision
 
-             ------------------
-         ____|_               |
+             +----------------+
+        +----|-+              |
         |    | |              |
-        |    --|---------------
+        |    +-|--------------+
         |      |
         |      |
-        |______|
+        +------+
             
             if x_left_1 < x_left_2 and x_right_1 >= x_left_2
 
         II. Right side collision
 
-        ------------------
-        |              __|___
+        +----------------+
+        |             +--|---+
         |             |  |   |
-        ------------------   |
+        +----------------+   |
                       |      |
                       |      |
-                      |______|
+                      +------+
 
 
             if x_left_1 >= x_left_2 and x_right_1 > x_right_2
 
         III. Full collision
 
-        ------------------
-        |    ______      |
+        +----------------+
+        |   +------+     |
         |   |      |     |
-        ------------------
+        +----------------+
             |      |
             |      |
-            |______|
+            +------+
 
 
             if x_left_1 >= x_left_2 and x_right_1 <= x_right_2
@@ -331,10 +359,14 @@ class Pixelation:
         For the left and right side collision, we do not care about whether the
         object's right x coordinate is greater than that of the other object.
 
-        NOTE: No need to worry about the height since the beam goes all the way up.
+        NOTE: In case of laser beam, no need to worry about the height since it goes all the way up.
+
         NOTE: Modifications to the inequalities are needed not to mingle the cases.
             For instance, in the first case, if we do not impose the restriction
             x_right_1 <= x_right_2, we get the third case.
+
+        NOTE: We could abstract out the third case, but it is better to have it
+            this way since the former option will needlessly overcomplicate things.
         """
         # Case I
         if x_left_1 < x_left_2 and (x_right_1 >= x_left_2 and x_right_1 <= x_right_2):
