@@ -1,27 +1,12 @@
 """
+P I X E L A T I O N
+
 David Oniani
 Licensed under MIT
 
-                            P I X E L A T I O N
-
-This is a simple retro-style game where you have a hero which roams around
-and tries to avoid getting hit by raging clouds. If you get hit by the cloud,
-your score goes down, however, if you actually manage to hit the cloud
-with the laser beam, you will get awarded with points. Be sure to time the laser
-beam properly since there is a short delay before being able to reuse it again.
-
-Note that everything in the game is built manually using pixels. Therefore,
-every tiny particle has its own coordinates and could be manipulated directly.
-This flexibility, however, comes with the price which is hard work for calculating
-various measures of moving objects such as the width of cloud.
-
-The game is implemented using retro-style game engine for Python called Pyxel.
-For more information, see https://github.com/kitao/pyxel
-
-
 TODO:
-    1. Randomize the raindrops' behavior
-    2. Fix the raindrop hit behavior
+    1. Clean up the code
+    2. Randomize the raindrops' behavior
     3. Consider using numpy for pixels, maybe?
 """
 
@@ -58,7 +43,7 @@ class Pixelation:
         self.rain1_x = 0            # Cloud 1 rain x coordinate
         self.rain2_x = 0            # Cloud 2 rain x coordinate
 
-        self.rain_coeff = 0         # Rain coefficient
+        self.rain_coeff = 1         # Rain coefficient
 
         # Character stuff
         self.hero_x = 0
@@ -169,36 +154,85 @@ class Pixelation:
         Cloud shooting animations.
 
         Hero:
-            x coordinate has the range: 7.875 + self.hero_x to 11.625 + self.hero_x
+            x coordinate has the range: 5.875 + self.hero_x to 13.625 + self.hero_x
             y coordinate has the range: 99.375 + self.hero_y to 105.625 + self.hero_y
         """ 
         # print("Height:", 40.05 + self.rain0_x / 5)  # approx 76
 
-        if 40.05 + self.rain0_x / 5 > 75:
-            self.rain_coeff = random.uniform(1, 1.5)
+        # if 40.05 + self.rain0_x / 5 > 75:
+            # self.rain_coeff = random.uniform(1, 1.5)
 
-        x = 10 * self.rain_coeff
+        # x = 10 * self.rain_coeff
 
-        pyxel.rect(2 * x + self.rain0_x / 5, 20 + self.rain0_x, 2 * x + 0.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
-        pyxel.rect(3 * x + self.rain0_x / 5, 20 + self.rain0_x, 3 * x + 0.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
-        pyxel.rect(4 * x + self.rain0_x / 5, 20 + self.rain0_x, 4 * x + 0.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
+        pyxel.rect(20 + self.rain0_x / 5, 20 + self.rain0_x, 20.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
+        pyxel.rect(30 + self.rain0_x / 5, 20 + self.rain0_x, 30.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
+        pyxel.rect(40 + self.rain0_x / 5, 20 + self.rain0_x, 40.05 + self.rain0_x / 5, 22 + self.rain0_x, 2)
 
-        pyxel.rect(8 * x  + self.rain1_x / 5, 20 + self.rain1_x, 8 * x + 0.05  + self.rain1_x / 5, 22 + self.rain1_x, 2)
-        pyxel.rect(9 * x  + self.rain1_x / 5, 20 + self.rain1_x, 9 * x + 0.05  + self.rain1_x / 5, 22 + self.rain1_x, 2)
-        pyxel.rect(10 * x + self.rain1_x / 5, 20 + self.rain1_x, 10 * x + 0.05 + self.rain1_x / 5, 22 + self.rain1_x, 2)
+        pyxel.rect(80  + self.rain1_x / 5, 20 + self.rain1_x, 80.05  + self.rain1_x / 5, 22 + self.rain1_x, 2)
+        pyxel.rect(90  + self.rain1_x / 5, 20 + self.rain1_x, 90.05  + self.rain1_x / 5, 22 + self.rain1_x, 2)
+        pyxel.rect(100 + self.rain1_x / 5, 20 + self.rain1_x, 100.05 + self.rain1_x / 5, 22 + self.rain1_x, 2)
 
-        pyxel.rect(14 * x + self.rain2_x / 5, 20 + self.rain2_x, 14 * x + 0.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
-        pyxel.rect(15 * x + self.rain2_x / 5, 20 + self.rain2_x, 15 * x + 0.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
-        pyxel.rect(16 * x + self.rain2_x / 5, 20 + self.rain2_x, 16 * x + 0.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
+        pyxel.rect(140 + self.rain2_x / 5, 20 + self.rain2_x, 140.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
+        pyxel.rect(150 + self.rain2_x / 5, 20 + self.rain2_x, 150.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
+        pyxel.rect(160 + self.rain2_x / 5, 20 + self.rain2_x, 160.05 + self.rain2_x / 5, 22 + self.rain2_x, 2)
 
         # To detect the collision, we need to match the ranges of x and y coordinates
-        # print("Cloud 0 leftmost raindrop", 2 * x + self.rain0_x / 5, 2 * x + 0.05 + self.rain0_x / 5)
-        # print("Hero x coordinate range", 7.875 + self.hero_x, 11.625 + self.hero_x)
+
+        # X coordinate testing
+        # print(self.detect_collision(20 + self.rain0_x / 5, 20.05 + self.rain0_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x))
+        # print("Hero x coordinate range ", "(", 5.875 + self.hero_x, ",", 13.625 + self.hero_x, ")")
+        # print("Cloud 0 leftmost raindrop x coordinate ", "(", 20 + self.rain0_x / 5, ",", 20 + 0.05 + self.rain0_x / 5, ")")
+
+        # Y coordinate testing
+        # print(self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x))
+        # print("Hero y coordinate range ", "(", 99.375 + self.hero_y, ",", 105.625 + self.hero_y, ")")
+        # print("Cloud 0 leftmost raindrop y coordinate", "(", 20 + self.rain0_x / 5, ",", 22 + self.rain0_x, ")")
 
         # We first detect the collision on the x-axis and then proceed by imposing restrictions on y-axis
-        # Ultimately, we will restrict horizontal and vertical spaces
-        if self.detect_collision(7.875 + self.hero_x, 11.625 + self.hero_x, 2 * x + self.rain0_x / 5, 2 * x + 0.05 + self.rain0_x / 5):
-            print("Placeholder")
+        # Ultimately, we will restrict both horizontal and vertical spaces
+        # Here is a trick that I came up with (I am sure there are better solutions to this, but let's use it for now):
+        # NOTE: Imagine playing as the rain, then we could apply the same detect_collision function under the inverse conditions!
+        # NOTE: The code below can be shortened as the second if statement (nested one) is always the same. Code repetition is bad!
+
+        # Cloud 0 raindrops
+        if self.detect_collision(20 + self.rain0_x / 5, 20.05 + self.rain0_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        if self.detect_collision(30 + self.rain0_x / 5, 30.05 + self.rain0_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        if self.detect_collision(40 + self.rain0_x / 5, 40.05 + self.rain0_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+
+        # Cloud 1 raindrops
+        if self.detect_collision(80  + self.rain1_x / 5, 80.05  + self.rain1_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        if self.detect_collision(90 + self.rain1_x / 5, 90.05  + self.rain1_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        if self.detect_collision(100 + self.rain1_x / 5, 100.05 + self.rain1_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        # Cloud 2 raindrops
+        if self.detect_collision(140 + self.rain2_x / 5, 140.05 + self.rain2_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        if self.detect_collision(150 + self.rain2_x / 5, 150.05 + self.rain2_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+        
+        if self.detect_collision(160 + self.rain2_x / 5, 160.05 + self.rain2_x / 5, 5.875 + self.hero_x, 13.625 + self.hero_x):
+            if self.detect_collision(99.375 + self.hero_y, 105.625 + self.hero_y, 20 + self.rain0_x / 5, 22 + self.rain0_x):
+                self.score -= 1
+
 
     def clouds(self):
         """
@@ -238,7 +272,7 @@ class Pixelation:
         """
         Draw the hero
 
-        x coordinate has the range: 7.875 + self.hero_x to 11.625 + self.hero_x
+        x coordinate has the range: 5.875 + self.hero_x to 13.625 + self.hero_x
         y coordinate has the range: 99.375 + self.hero_y to 105.625 + self.hero_y
         """
         pyxel.circ(10 + self.hero_x, 102 + self.hero_y, 7, 7)         # Head
@@ -307,13 +341,13 @@ class Pixelation:
                 self.score += 1
 
     def detect_collision(self, x_left_1, x_right_1, x_left_2, x_right_2):
-        """[Collision detection algorithm.]
+        """Collision detection algorithm.
         
         Arguments:
-            x_left_1  {[float]} -- [left, smaller, x coordinate for the first object]
-            x_right_1 {[float]} -- [right, bigger, x coordinate for the first object]
-            x_left_2  {[float]} -- [left, smaller, x coordinate for the second object]
-            x_right_2 {[float]} -- [right, bigger, x coordinate for the second object]
+            x_left_1  {[float]} -- left, smaller, x coordinate for the first object.
+            x_right_1 {[float]} -- right, bigger, x coordinate for the first object.
+            x_left_2  {[float]} -- left, smaller, x coordinate for the second object.
+            x_right_2 {[float]} -- right, bigger, x coordinate for the second object.
 
         There are three possible cases.
 
