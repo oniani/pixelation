@@ -11,5 +11,5 @@ every tiny particle has its own coordinates and could be manipulated directly.
 This flexibility, however, comes with the price which is hard work for calculating
 various measures of moving objects such as the width of cloud.
 
-The game is implemented using retro-style game engine for Python called Pyxel.
+The game is implemented using retro game engine for Python called Pyxel.
 For more information, see https://github.com/kitao/pyxel

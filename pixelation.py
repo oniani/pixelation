@@ -5,13 +5,16 @@ David Oniani
 Licensed under MIT
 
 TODO:
-    1. Clean up the code
-    2. Randomize the raindrops' behavior
+    1. Randomize the raindrops' behavior
 """
 
 
 # Have to manually disable pylint for this project.
 # Otherwise, get pylint(E1101) warning.
+# Below is the explanation of why it happens
+# NOTE: pyxel initiates an object and binds its methods to the pyxel module.
+#       You canont use these methods until the init function has been called.
+#       This makes a nice API but unfortunately not so good for static analysis.
 
 # pylint: disable-all
 
@@ -21,8 +24,8 @@ import time
 import random
 
 
-WIDTH  = 180
-HEIGHT = 120
+WINDOW_WIDTH  = 180
+WINDOW_HEIGHT = 120
 
 JUMP_HEIGHT = 20
 RAIN_COEFF  = 0
@@ -31,12 +34,13 @@ HIT_SCORE = 1
 
 
 class Pixelation:
-    """The core class for the game"""
+    """The core class of the game."""
     def __init__(self) -> None:
-        pyxel.init(WIDTH, HEIGHT, caption="Pixelation")
+        pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT, caption="Pixelation")
 
-        self.start_time = time.time()       # Track the time (needed for various reasons...)
-        self.run = False                    # The state of the game - have not started yet, running or over
+        self.start_time = 0                 # Start time
+        self.timer      = 0                 # Track the time
+        self.run        = False             # The state of the game - have not started yet, running or over
 
         # Cloud variables
         self.cloud0_x = 0                   # Starting x coordinate for the cloud 0
@@ -72,7 +76,34 @@ class Pixelation:
         self.laser_beam_timer  = 0          # Laser beam time gap (reset time to be able to reuse it again)
         self.hit_score         = HIT_SCORE  # Increment in score when laser beam hits the cloud
 
-        pyxel.run(self.update, self.draw)
+        # Sound settings
+        pyxel.sound(0).set(
+            "e2e2c2g1 g1g1c2e2 d2d2d2g2 g2g2rr" "c2c2a1e1 e1e1a1c2 b1b1b1e2 e2e2rr",
+            "p",
+            "6",
+            "vffn fnff vffs vfnn",
+            25,
+        )
+
+        pyxel.sound(1).set(
+            "r a1b1c2 b1b1c2d2 g2g2g2g2 c2c2d2e2" "f2f2f2e2 f2e2d2c2 d2d2d2d2 g2g2r r ",
+            "s",
+            "6",
+            "nnff vfff vvvv vfff svff vfff vvvv svnn",
+            25,
+        )
+
+        pyxel.sound(2).set(
+            "c1g1c1g1 c1g1c1g1 b0g1b0g1 b0g1b0g1" "a0e1a0e1 a0e1a0e1 g0d1g0d1 g0d1g0d1",
+            "t",
+            "7",
+            "n",
+            25,
+        )
+
+        self.play_music()                   # Play the music
+
+        pyxel.run(self.update, self.draw)   # Rn the environment
 
     def update(self) -> None:
         """Update the environment."""
@@ -84,9 +115,12 @@ class Pixelation:
         # Press 'enter' to start the game
         elif pyxel.btn(pyxel.KEY_ENTER):
             self.run = True
+            self.start_time = time.time()
 
         # If the player pressed 'enter', run the game
         if self.run:
+            self.timer = round(time.time() - self.start_time, 1)  # Update time
+
             self.cloud0_x = (self.cloud0_x + 1.25) % pyxel.width  # Cloud 0
             self.cloud1_x = (self.cloud1_x + 1.25) % pyxel.width  # Cloud 1
             self.cloud2_x = (self.cloud2_x + 1.25) % pyxel.width  # Cloud 2
@@ -123,24 +157,33 @@ class Pixelation:
         self.clouds()       # Draw the clouds
 
         if time.time() - self.start_time >= 3:
-            self.rain()     # Enable rain
+            self.rain()     # Enable rain 3 seconds after the 'enter' key is hit
 
         self.ground()       # Draw the ground
         self.hero()         # Draw the hero
         self.jump()         # Jump
         self.laser_beam()   # Laser beam activation
         self.game_over()    # Check if the game is over
-        self.constraints()  # Impose constraints
-
-        # Put the score in the upper-right corner
-        score = 'SCORE {:>1}'.format(self.score)
-        pyxel.text(4, 5, score, 1)
-        pyxel.text(4, 4, score, 7)
+        self.constraints()  # Impose constraints on the hero
+        self.show_score()   # Draw the score
+        self.show_timer()   # Show the elapsed time
 
     def welcome(self) -> None:
         """Welcome text."""
-        if not self.run and self.score >= -500:
+        if not self.run and self.score >= -100:
             pyxel.text(28, 50, "Welcome to P I X E L A T I O N!", pyxel.frame_count % 16)
+
+    def show_score(self) -> None:
+        """Put the score in the upper-right corner."""
+        score = f"SCORE {self.score}"
+        pyxel.text(4, 5, score, 1)
+        pyxel.text(4, 4, score, 7)
+
+    def show_timer(self) -> None:
+        """Show the timer under the score."""
+        timer = f"TIME {self.timer}"
+        pyxel.text(4, 13, timer, 1)
+        pyxel.text(4, 12, timer, 7)
 
     def cloud(self, x: float) -> None:
         """Representation of the cloud."""
@@ -197,12 +240,7 @@ class Pixelation:
             pyxel.rect(k + self.rain2_x / 5, 20 + self.rain2_x, k + self.rain2_x / 5 + 0.05, 22 + self.rain2_x, 2)
 
         # NOTE: The part below deals with the collision detection
-        # NOTE: To detect the collision, we need to match the ranges of x and y coordinates
         # NOTE: We first detect the collision on the x-axis and then proceed by imposing restrictions on y-axis
-        # NOTE: Ultimately, we will restrict both horizontal and vertical spaces
-        # NOTE: Here is a trick that I came up with (I am sure there are better solutions to this, but let's use it for now):
-        # NOTE: Imagine playing as the rain, then we could apply the same detect_collision function under the inverse conditions!
-        # NOTE: We use "20 + self.rain0_x / 5, 22 + self.rain0_x" as all the raindrops fall from the same height
 
         cordinates_list = [ 20  + self.rain0_x / 5, 30  + self.rain0_x / 5, 40  + self.rain0_x / 5,
                             80  + self.rain1_x / 5, 90  + self.rain1_x / 5, 100 + self.rain1_x / 5,
@@ -211,7 +249,8 @@ class Pixelation:
         for coordinate in cordinates_list:
             if self.detect_collision(coordinate, coordinate + 0.05, 5.875 + self.hero_x, 13.625 + self.hero_x):
                 if self.detect_collision(20 + self.rain0_x / 5, 22 + self.rain0_x, 99.375 + self.hero_y, 105.625 + self.hero_y):
-                    self.score -= 5 * self.hit_score
+                    if self.run:
+                        self.score -= 10 * self.hit_score  # Subtract tenfold
 
     def ground(self) -> None:
         """Draw the ground."""
@@ -361,11 +400,18 @@ class Pixelation:
         elif self.hero_y + 82 > 120:
             self.hero_y = 0
 
+    def play_music(self) -> None:
+        """Background music for the game."""
+        pyxel.play(0, [0, 1], loop=True)
+        pyxel.play(1, [2, 3], loop=True)
+        pyxel.play(2, 4, loop=True)
+
     def game_over(self) -> None:
-        """If the score is below -500, shows the "Game Over" screen."""
-        if self.score < -500:
+        """If the score is below -100, shows the "GAME OVER" screen."""
+        if self.score < -100:
             self.run = False
-            pyxel.text(70, 50, "Game Over", pyxel.frame_count % 16)
+            pyxel.text(70, 40, "GAME OVER", pyxel.frame_count % 16)
+            pyxel.text(45, 50, f"YOUR FINAL SCORE IS {round(self.score / self.timer)}", pyxel.frame_count % 16)
 
 
 if __name__ == "__main__":
