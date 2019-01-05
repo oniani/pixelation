@@ -115,20 +115,78 @@ class Pixelation:
 
     def update(self) -> None:
         """Update the environment."""
-        # If the player pressed 'enter', to run the game
+        # If the player pressed the 'Enter' key, to run the game
         if self.is_running:
             # Update the timer
             self.timer = round(time.time() - self.start_time, 1)
 
             # Cloud updates
-            self.cloud0_x = (self.cloud0_x + 1.25) % pyxel.width
-            self.cloud1_x = (self.cloud1_x + 1.25) % pyxel.width
-            self.cloud2_x = (self.cloud2_x + 1.25) % pyxel.width
 
-            # Laser beam updates
-            self.rain0_x = (self.rain0_x + 1.75) % pyxel.width
-            self.rain1_x = (self.rain1_x + 1.75) % pyxel.width
-            self.rain2_x = (self.rain2_x + 1.75) % pyxel.width
+            # Increase the speed
+            if self.score <= 100:
+                # The cloud updates
+                self.cloud0_x = (self.cloud0_x + 1.25) % pyxel.width
+                self.cloud1_x = (self.cloud1_x + 1.25) % pyxel.width
+                self.cloud2_x = (self.cloud2_x + 1.25) % pyxel.width
+                # The rain updates
+                self.rain0_x = (self.rain0_x + 1.75) % pyxel.width
+                self.rain1_x = (self.rain1_x + 1.75) % pyxel.width
+                self.rain2_x = (self.rain2_x + 1.75) % pyxel.width
+
+            # Increase the speed
+            elif self.score <= 200:
+                # The cloud updates
+                self.cloud0_x = (self.cloud0_x + 1.5) % pyxel.width
+                self.cloud1_x = (self.cloud1_x + 1.5) % pyxel.width
+                self.cloud2_x = (self.cloud2_x + 1.5) % pyxel.width
+                # The rain updates
+                self.rain0_x = (self.rain0_x + 2) % pyxel.width
+                self.rain1_x = (self.rain1_x + 2) % pyxel.width
+                self.rain2_x = (self.rain2_x + 2) % pyxel.width
+
+            # Increase the speed
+            elif self.score <= 400:
+                # The cloud updates
+                self.cloud0_x = (self.cloud0_x + 1.75) % pyxel.width
+                self.cloud1_x = (self.cloud1_x + 1.75) % pyxel.width
+                self.cloud2_x = (self.cloud2_x + 1.75) % pyxel.width
+                # The rain updates
+                self.rain0_x = (self.rain0_x + 2.25) % pyxel.width
+                self.rain1_x = (self.rain1_x + 2.25) % pyxel.width
+                self.rain2_x = (self.rain2_x + 2.25) % pyxel.width
+
+            # Increase the speed
+            elif self.score <= 800:
+                # The cloud updates
+                self.cloud0_x = (self.cloud0_x + 2) % pyxel.width
+                self.cloud1_x = (self.cloud1_x + 2) % pyxel.width
+                self.cloud2_x = (self.cloud2_x + 2) % pyxel.width
+                # The rain updates
+                self.rain0_x = (self.rain0_x + 2.5) % pyxel.width
+                self.rain1_x = (self.rain1_x + 2.5) % pyxel.width
+                self.rain2_x = (self.rain2_x + 2.5) % pyxel.width
+
+            # Increase the speed
+            elif self.score <= 1600:
+                # The cloud updates
+                self.cloud0_x = (self.cloud0_x + 2.25) % pyxel.width
+                self.cloud1_x = (self.cloud1_x + 2.25) % pyxel.width
+                self.cloud2_x = (self.cloud2_x + 2.25) % pyxel.width
+                # The rain updates
+                self.rain0_x = (self.rain0_x + 2.75) % pyxel.width
+                self.rain1_x = (self.rain1_x + 2.75) % pyxel.width
+                self.rain2_x = (self.rain2_x + 2.75) % pyxel.width
+
+            # Increase the speed
+            else:
+                # The cloud updates
+                self.cloud0_x = (self.cloud0_x + 3) % pyxel.width
+                self.cloud1_x = (self.cloud1_x + 3) % pyxel.width
+                self.cloud2_x = (self.cloud2_x + 3) % pyxel.width
+                # The rain updates
+                self.rain0_x = (self.rain0_x + 3) % pyxel.width
+                self.rain1_x = (self.rain1_x + 3) % pyxel.width
+                self.rain2_x = (self.rain2_x + 3) % pyxel.width
 
             # Press the 'leftarrow' key or the 'A' key to move left
             if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.KEY_A):
@@ -142,7 +200,7 @@ class Pixelation:
             elif pyxel.btn(pyxel.KEY_UP) or pyxel.btn(pyxel.KEY_W):
                 self.is_jumping = True
 
-            # Press the 'SPACE' key to shoot the laser beam
+            # Press the 'Space' key to shoot the laser beam
             elif pyxel.btnp(pyxel.KEY_SPACE):
                 self.laser_is_shooting = True
 
@@ -154,7 +212,7 @@ class Pixelation:
             elif pyxel.btnp(pyxel.KEY_Q):
                 pyxel.quit()
         else:
-            # Press 'enter' to start the game
+            # Press the 'Enter' key to start the game
             if pyxel.btnp(pyxel.KEY_ENTER):
                 self.is_running = True
                 self.start_time = time.time()
@@ -176,7 +234,7 @@ class Pixelation:
         self.clouds()       # Draw the clouds
 
         if time.time() - self.start_time >= 3:
-            self.rain()     # Enable rain 3 seconds after 'enter' key is hit
+            self.rain()     # Rain 3 seconds after the 'Enter' key is hit
 
         self.ground()       # Draw the ground
         self.hero()         # Draw the hero
@@ -253,6 +311,15 @@ class Pixelation:
 
     def rain(self) -> None:
         """Shooting animations for the clouds."""
+        # Randomize the raindrops
+        # start = random.randrange(0, WINDOW_WIDTH + 1)
+        # end = start + 20
+        #
+        # The code below can randomize the raindrops, however, it
+        # does the randomization on each update. We need to keep
+        # track of the height so it happens only on new updates
+        # That will be it.
+
         # Cloud 0 rain
         for i in range(20, 41, 10):
             pyxel.rect(
@@ -268,15 +335,14 @@ class Pixelation:
             )
 
         # Cloud 2 rain
-        for k in range(140, 151, 10):
+        for k in range(140, 161, 10):
             pyxel.rect(
                 k + self.rain2_x / 5, 20 + self.rain2_x,
                 k + self.rain2_x / 5 + 0.05, 22 + self.rain2_x, 2
             )
 
-        # NOTE: The part below deals with the collision detection
-        # NOTE: We first detect the collision on the x-axis
-        #       and then proceed by imposing restrictions on y-axis
+        # Collision detection
+        # NOTE: We first detect the collision on the x-axis and then on y-axis
 
         coordinates = [
             # Cloud 0 rain
