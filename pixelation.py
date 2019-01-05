@@ -3,9 +3,6 @@ P I X E L A T I O N
 
 David Oniani
 Licensed under MIT
-
-TODO:
-    1. Randomize the raindrops' behavior
 """
 
 
@@ -14,7 +11,7 @@ TODO:
 # Below is the explanation of why it happens
 # NOTE: pyxel initiates an object and binds its methods to the pyxel module.
 #       You canont use these methods until the init function has been called.
-#       Makes a nice API but unfortunately not so good for static analysis.
+#       This makes a nice API but is not so good for the static analysis.
 
 # pylint: disable-all
 
@@ -28,7 +25,6 @@ WINDOW_WIDTH = 180
 WINDOW_HEIGHT = 120
 
 JUMP_HEIGHT = 20
-RAIN_COEFF = 0
 
 HIT_SCORE = 1
 
@@ -93,7 +89,12 @@ class Pixelation:
         self.rain1_x = 0                   # Cloud 1 rain x coordinate
         self.rain2_x = 0                   # Cloud 2 rain x coordinate
 
-        self.rain_coeff = RAIN_COEFF       # The speed of precipitation
+        self.start0 = 20                   # Start x coordinate Cloud 0 rain
+        self.end0 = 41                     # End x coordinate Cloud 0 rain
+        self.start1 = 80                   # Start x coordinate Cloud 1 rain
+        self.end1 = 101                    # End x coordinate Cloud 1 rain
+        self.start2 = 140                  # Start x coordinate Cloud 2 rain
+        self.end2 = 161                    # End x coordinate Cloud 2 rain
 
         # Character variables
         self.hero_x = 0                    # Current x coordinate of the hero
@@ -122,8 +123,8 @@ class Pixelation:
 
             # Cloud updates
 
-            # Increase the speed
-            if self.score <= 100:
+            # Level 0 - score is below 100
+            if self.score < 100:
                 # The cloud updates
                 self.cloud0_x = (self.cloud0_x + 1.25) % pyxel.width
                 self.cloud1_x = (self.cloud1_x + 1.25) % pyxel.width
@@ -133,8 +134,8 @@ class Pixelation:
                 self.rain1_x = (self.rain1_x + 1.75) % pyxel.width
                 self.rain2_x = (self.rain2_x + 1.75) % pyxel.width
 
-            # Increase the speed
-            elif self.score <= 200:
+            # Level 1 - score is below 200
+            elif self.score < 200:
                 # The cloud updates
                 self.cloud0_x = (self.cloud0_x + 1.5) % pyxel.width
                 self.cloud1_x = (self.cloud1_x + 1.5) % pyxel.width
@@ -144,8 +145,8 @@ class Pixelation:
                 self.rain1_x = (self.rain1_x + 2) % pyxel.width
                 self.rain2_x = (self.rain2_x + 2) % pyxel.width
 
-            # Increase the speed
-            elif self.score <= 400:
+            # Level 2 - score is below 400
+            elif self.score < 400:
                 # The cloud updates
                 self.cloud0_x = (self.cloud0_x + 1.75) % pyxel.width
                 self.cloud1_x = (self.cloud1_x + 1.75) % pyxel.width
@@ -155,8 +156,8 @@ class Pixelation:
                 self.rain1_x = (self.rain1_x + 2.25) % pyxel.width
                 self.rain2_x = (self.rain2_x + 2.25) % pyxel.width
 
-            # Increase the speed
-            elif self.score <= 800:
+            # Level 3 - score is below 500
+            elif self.score < 800:
                 # The cloud updates
                 self.cloud0_x = (self.cloud0_x + 2) % pyxel.width
                 self.cloud1_x = (self.cloud1_x + 2) % pyxel.width
@@ -166,8 +167,8 @@ class Pixelation:
                 self.rain1_x = (self.rain1_x + 2.5) % pyxel.width
                 self.rain2_x = (self.rain2_x + 2.5) % pyxel.width
 
-            # Increase the speed
-            elif self.score <= 1600:
+            # Level 4 - score is below 1600
+            elif self.score < 1600:
                 # The cloud updates
                 self.cloud0_x = (self.cloud0_x + 2.25) % pyxel.width
                 self.cloud1_x = (self.cloud1_x + 2.25) % pyxel.width
@@ -177,7 +178,7 @@ class Pixelation:
                 self.rain1_x = (self.rain1_x + 2.75) % pyxel.width
                 self.rain2_x = (self.rain2_x + 2.75) % pyxel.width
 
-            # Increase the speed
+            # Level 5 - score is greater than or equal to 1600
             else:
                 # The cloud updates
                 self.cloud0_x = (self.cloud0_x + 3) % pyxel.width
@@ -310,35 +311,50 @@ class Pixelation:
             self.cloud(self.cloud2_x + 120)
 
     def rain(self) -> None:
-        """Shooting animations for the clouds."""
-        # Randomize the raindrops
-        # start = random.randrange(0, WINDOW_WIDTH + 1)
-        # end = start + 20
-        #
-        # The code below can randomize the raindrops, however, it
-        # does the randomization on each update. We need to keep
-        # track of the height so it happens only on new updates
-        # That will be it.
+        """Shooting animations for the clouds.
+
+        The function also includes the collision
+        detection for the raindrops.
+        """
+        if 40.05 + self.rain0_x / 5 > 70:
+            self.start0 = random.randrange(0, WINDOW_WIDTH + 1)
+            self.end0 = self.start0 + 21
+
+        if 40.05 + self.rain1_x / 5 > 70:
+            self.start1 = random.randrange(0, WINDOW_WIDTH + 1)
+            self.end1 = self.start1 + 21
+
+        if 40.05 + self.rain2_x / 5 > 70:
+            self.start2 = random.randrange(0, WINDOW_WIDTH + 1)
+            self.end2 = self.start2 + 21
 
         # Cloud 0 rain
-        for i in range(20, 41, 10):
+        for i in range(self.start0, self.end0, 10):
             pyxel.rect(
-                i + self.rain0_x / 5, 20 + self.rain0_x,
-                i + self.rain0_x / 5 + 0.05, 22 + self.rain0_x, 2
+                i + self.rain0_x / 5,
+                20 + self.rain0_x,
+                i + self.rain0_x / 5 + 0.05,
+                22 + self.rain0_x,
+                2
             )
 
         # Cloud 1 rain
-        for j in range(80, 101, 10):
+        for j in range(self.start1, self.end1, 10):
             pyxel.rect(
-                j + self.rain1_x / 5, 20 + self.rain1_x,
-                j + self.rain1_x / 5 + 0.05, 22 + self.rain1_x, 2
+                j + self.rain1_x / 5,
+                20 + self.rain1_x,
+                j + self.rain1_x / 5 + 0.05,
+                22 + self.rain1_x, 2
             )
 
         # Cloud 2 rain
-        for k in range(140, 161, 10):
+        for k in range(self.start2, self.end2, 10):
             pyxel.rect(
-                k + self.rain2_x / 5, 20 + self.rain2_x,
-                k + self.rain2_x / 5 + 0.05, 22 + self.rain2_x, 2
+                k + self.rain2_x / 5,
+                20 + self.rain2_x,
+                k + self.rain2_x / 5 + 0.05,
+                22 + self.rain2_x,
+                2
             )
 
         # Collision detection
@@ -362,7 +378,7 @@ class Pixelation:
         for coordinate in coordinates:
             if (self.detect_collision(
                     coordinate,
-                    coordinate + 0.05,
+                    0.05 + coordinate,
                     5.875 + self.hero_x,
                     13.625 + self.hero_x
                     ) and
