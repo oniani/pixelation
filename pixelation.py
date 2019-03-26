@@ -16,9 +16,9 @@ Licensed under MIT
 # pylint: disable-all
 
 
-import pyxel
 import time
 import random
+import pyxel
 
 
 WINDOW_WIDTH = 180
@@ -316,14 +316,17 @@ class Pixelation:
         The function also includes the collision
         detection for the raindrops.
         """
+        # Randomization of raindrops for cloud0
         if 40.05 + self.rain0_x / 5 > 70:
             self.start0 = random.randrange(0, WINDOW_WIDTH + 1)
             self.end0 = self.start0 + 21
 
+        # Randomization of raindrops for cloud1
         if 40.05 + self.rain1_x / 5 > 70:
             self.start1 = random.randrange(0, WINDOW_WIDTH + 1)
             self.end1 = self.start1 + 21
 
+        # Randomization of raindrops for cloud2
         if 40.05 + self.rain2_x / 5 > 70:
             self.start2 = random.randrange(0, WINDOW_WIDTH + 1)
             self.end2 = self.start2 + 21
