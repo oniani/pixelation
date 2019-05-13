@@ -16,11 +16,10 @@ various measures of moving objects such as the width of cloud.
 The game is implemented using retro game engine for Python called Pyxel.
 For more information, see https://github.com/kitao/pyxel
 
-### Running The Game
-
+## Running The Game
 You will need to install (if not installed) **Python 3**, **Pyxel**, and, depending on the operating system, **GLFW**.
 
-#### Windows
+### Windows
 ```sh
 $ pip install pyxel
 $ git clone https://github.com/oniani/pixelation.git
@@ -28,7 +27,7 @@ $ cd pixelation
 $ python3 pixelation.py
 ```
 
-#### macOS
+### macOS
 ```sh
 $ brew install python3 glfw
 $ pip3 install pyxel
@@ -37,7 +36,7 @@ $ cd pixelation
 $ python3 pixelation.py
 ```
 
-#### Ubuntu / Debian
+### Ubuntu / Debian
 ```sh
 $ sudo apt install python3 python3-pip libglfw3 libportaudio2
 $ sudo pip3 install pyxel
@@ -46,7 +45,7 @@ $ cd pixelation
 $ python3 pixelation.py
 ```
 
-### Controls
+## Controls
 `Key`         | `Action`
 :------------:|:------------:
 `Enter`       | Start The Game
@@ -59,3 +58,6 @@ $ python3 pixelation.py
 `W`           | Jump
 `A`           | Move Left
 `D`           | Move Right
+
+## License
+[GNU General Public License v3.0](LICENSE)

@@ -2,7 +2,7 @@
 P I X E L A T I O N
 
 David Oniani
-Licensed under MIT
+Licensed under GNU General Public License v3.0
 """
 
 
