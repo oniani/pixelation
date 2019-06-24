@@ -18,7 +18,8 @@ For more information, see https://github.com/kitao/pyxel
 
 ## Running The Game
 
-You will need to install (if not installed) **Python 3**, **Pyxel**, and, depending on the operating system, **GLFW**.
+You will need to install (if not installed) **Python 3**, **Pyxel**, and, depending
+on the operating system, some other additional libraries.
 
 ### Windows
 
