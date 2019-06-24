@@ -17,47 +17,53 @@ The game is implemented using retro game engine for Python called Pyxel.
 For more information, see https://github.com/kitao/pyxel
 
 ## Running The Game
+
 You will need to install (if not installed) **Python 3**, **Pyxel**, and, depending on the operating system, **GLFW**.
 
 ### Windows
+
 ```sh
-$ pip install pyxel
+$ pip install pyxel==0.8.0
 $ git clone https://github.com/oniani/pixelation.git
 $ cd pixelation
 $ python3 pixelation.py
 ```
 
 ### macOS
+
 ```sh
-$ brew install python3 glfw
-$ pip3 install pyxel
+$ brew install python3 sdl2 sdl2_image
+$ pip3 install pyxel==0.8.0
 $ git clone https://github.com/oniani/pixelation.git
 $ cd pixelation
 $ python3 pixelation.py
 ```
 
 ### Ubuntu / Debian
+
 ```sh
-$ sudo apt install python3 python3-pip libglfw3 libportaudio2
-$ sudo pip3 install pyxel
+$ sudo apt install python3 python3-pip libsdl2-dev libsdl2-image-dev
+$ sudo pip3 install pyxel==0.8.0
 $ git clone https://github.com/oniani/pixelation.git
 $ cd pixelation
 $ python3 pixelation.py
 ```
 
 ## Controls
-`Key`         | `Action`
-:------------:|:------------:
-`Enter`       | Start The Game
-`P`           | Pause/Resume The Game
-`Q`           | Quit The Game
-`Space`       | Shoot The Laser Beam
-`Up Arrow`    | Jump
-`Left Arrow`  | Move Left
-`Right Arrow` | Move Right
-`W`           | Jump
-`A`           | Move Left
-`D`           | Move Right
+
+| Key           | Action                |
+| ------------- | --------------------- |
+| `Enter`       | Start The Game        |
+| `P`           | Pause/Resume The Game |
+| `Q`           | Quit The Game         |
+| `Space`       | Shoot The Laser Beam  |
+| `Up Arrow`    | Jump                  |
+| `Left Arrow`  | Move Left             |
+| `Right Arrow` | Move Right            |
+| `W`           | Jump                  |
+| `A`           | Move Left             |
+| `D`           | Move Right            |
 
 ## License
+
 [GNU General Public License v3.0](LICENSE)

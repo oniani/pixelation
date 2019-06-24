@@ -31,6 +31,7 @@ HIT_SCORE = 1
 
 class Pixelation:
     """The core class of the game."""
+
     def __init__(self) -> None:
         pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT, caption="Pixelation")
 
@@ -66,51 +67,51 @@ class Pixelation:
             25,
         )
 
-        self.play_music()                  # Play music with all sound effects
+        self.play_music()  # Play music with all sound effects
 
-        self.start_time = 0                # Start time
-        self.timer = 0                     # Track the time
-        self.is_running = False            # Is the game running?
-        self.is_paused = False             # Is the game paused?
+        self.start_time = 0  # Start time
+        self.timer = 0  # Track the time
+        self.is_running = False  # Is the game running?
+        self.is_paused = False  # Is the game paused?
 
         # Cloud variables
-        self.cloud0_x = 0                  # Starting x coordinate for cloud 0
-        self.cloud1_x = 0                  # Starting x coordinate for cloud 1
-        self.cloud2_x = 0                  # Starting x coordinate for cloud 2
+        self.cloud0_x = 0  # Starting x coordinate for cloud 0
+        self.cloud1_x = 0  # Starting x coordinate for cloud 1
+        self.cloud2_x = 0  # Starting x coordinate for cloud 2
 
-        self.loop_1 = False                # Do not use reset cloud
-        self.loop_2 = False                # Do not use reset cloud
+        self.loop_1 = False  # Do not use reset cloud
+        self.loop_2 = False  # Do not use reset cloud
 
-        self.go_into_loop_1 = True         # Check if x coordinate > limit
-        self.go_into_loop_2 = True         # Check if x coordinate > limit
+        self.go_into_loop_1 = True  # Check if x coordinate > limit
+        self.go_into_loop_2 = True  # Check if x coordinate > limit
 
         # Rain variables
-        self.rain0_x = 0                   # Cloud 0 rain x coordinate
-        self.rain1_x = 0                   # Cloud 1 rain x coordinate
-        self.rain2_x = 0                   # Cloud 2 rain x coordinate
+        self.rain0_x = 0  # Cloud 0 rain x coordinate
+        self.rain1_x = 0  # Cloud 1 rain x coordinate
+        self.rain2_x = 0  # Cloud 2 rain x coordinate
 
-        self.start0 = 20                   # Start x coordinate Cloud 0 rain
-        self.end0 = 41                     # End x coordinate Cloud 0 rain
-        self.start1 = 80                   # Start x coordinate Cloud 1 rain
-        self.end1 = 101                    # End x coordinate Cloud 1 rain
-        self.start2 = 140                  # Start x coordinate Cloud 2 rain
-        self.end2 = 161                    # End x coordinate Cloud 2 rain
+        self.start0 = 20  # Start x coordinate Cloud 0 rain
+        self.end0 = 41  # End x coordinate Cloud 0 rain
+        self.start1 = 80  # Start x coordinate Cloud 1 rain
+        self.end1 = 101  # End x coordinate Cloud 1 rain
+        self.start2 = 140  # Start x coordinate Cloud 2 rain
+        self.end2 = 161  # End x coordinate Cloud 2 rain
 
         # Character variables
-        self.hero_x = 0                    # Current x coordinate of the hero
-        self.hero_y = 0                    # Current y coordinate of the hero
-        self.score = 0                     # Total score
+        self.hero_x = 0  # Current x coordinate of the hero
+        self.hero_y = 0  # Current y coordinate of the hero
+        self.score = 0  # Total score
 
         # Jump variables
-        self.velocity = 0                  # Increment velocity
-        self.jump_height = JUMP_HEIGHT     # Jump height
-        self.is_jumping = False            # Variable declaration, for jumping
-        self.jump_num = 0                  # How many times did it jump?
+        self.velocity = 0  # Increment velocity
+        self.jump_height = JUMP_HEIGHT  # Jump height
+        self.is_jumping = False  # Variable declaration, for jumping
+        self.jump_num = 0  # How many times did it jump?
 
         # Laser beam variables
-        self.laser_is_shooting = False     # Are the clouds shooting?
-        self.laser_beam_timer = 0          # Laser beam time gap
-        self.hit_score = HIT_SCORE         # Score increment for laser hit
+        self.laser_is_shooting = False  # Are the clouds shooting?
+        self.laser_beam_timer = 0  # Laser beam time gap
+        self.hit_score = HIT_SCORE  # Score increment for laser hit
 
         pyxel.run(self.update, self.draw)  # Run the environment
 
@@ -231,21 +232,22 @@ class Pixelation:
         """Draw the environment."""
         pyxel.cls(13)
 
-        self.welcome()      # Welcome the player
-        self.clouds()       # Draw the clouds
+        self.welcome()
+        self.clouds()
 
+        # Rain 3 seconds after the 'Enter' key is hit
         if time.time() - self.start_time >= 3:
-            self.rain()     # Rain 3 seconds after the 'Enter' key is hit
+            self.rain()
 
-        self.ground()       # Draw the ground
-        self.hero()         # Draw the hero
-        self.jump()         # Jump
-        self.laser_beam()   # Laser beam activation
-        self.pause()        # Check if the game is paused
-        self.game_over()    # Check if the game is over
-        self.constraints()  # Impose constraints on the hero
-        self.show_score()   # Draw the score
-        self.show_timer()   # Show the elapsed time
+        self.ground()
+        self.hero()
+        self.jump()
+        self.laser_beam()
+        self.pause()
+        self.game_over()
+        self.constraints()
+        self.show_score()
+        self.show_timer()
 
     def welcome(self) -> None:
         """Welcome text."""
@@ -255,7 +257,7 @@ class Pixelation:
                 28,
                 50,
                 "Welcome to P I X E L A T I O N!",
-                pyxel.frame_count % 16
+                pyxel.frame_count % 16,
             )
 
     def show_score(self) -> None:
@@ -338,7 +340,7 @@ class Pixelation:
                 20 + self.rain0_x,
                 i + self.rain0_x / 5 + 0.05,
                 22 + self.rain0_x,
-                2
+                2,
             )
 
         # Cloud 1 rain
@@ -347,7 +349,8 @@ class Pixelation:
                 j + self.rain1_x / 5,
                 20 + self.rain1_x,
                 j + self.rain1_x / 5 + 0.05,
-                22 + self.rain1_x, 2
+                22 + self.rain1_x,
+                2,
             )
 
         # Cloud 2 rain
@@ -357,7 +360,7 @@ class Pixelation:
                 20 + self.rain2_x,
                 k + self.rain2_x / 5 + 0.05,
                 22 + self.rain2_x,
-                2
+                2,
             )
 
         # Collision detection
@@ -375,22 +378,25 @@ class Pixelation:
             # Cloud 2 rain
             140 + self.rain2_x / 5,
             150 + self.rain2_x / 5,
-            160 + self.rain2_x / 5
-            ]
+            160 + self.rain2_x / 5,
+        ]
 
         for coordinate in coordinates:
-            if (self.detect_collision(
+            if (
+                self.detect_collision(
                     coordinate,
                     0.05 + coordinate,
                     5.875 + self.hero_x,
-                    13.625 + self.hero_x
-                    ) and
-                self.detect_collision(
+                    13.625 + self.hero_x,
+                )
+                and self.detect_collision(
                     20 + self.rain0_x / 5,
                     22 + self.rain0_x,
                     99.375 + self.hero_y,
-                    105.625 + self.hero_y
-                    ) and self.is_running):
+                    105.625 + self.hero_y,
+                )
+                and self.is_running
+            ):
                 self.score -= 10 * self.hit_score  # Subtract tenfold
 
     def ground(self) -> None:
@@ -454,7 +460,7 @@ class Pixelation:
                 95 + self.hero_y,
                 12 + self.hero_x,
                 0 + self.hero_y,
-                8
+                8,
             )
             end = time.time()
             self.laser_beam_timer += end - start
@@ -464,24 +470,27 @@ class Pixelation:
                 self.laser_beam_timer = 0
 
             if self.detect_collision(
-                    8 + self.hero_x,
-                    12 + self.hero_x,
-                    12.5 + self.cloud0_x,
-                    44.5 + self.cloud0_x):
+                8 + self.hero_x,
+                12 + self.hero_x,
+                12.5 + self.cloud0_x,
+                44.5 + self.cloud0_x,
+            ):
                 self.score += self.hit_score
 
             if self.detect_collision(
-                    8 + self.hero_x,
-                    12 + self.hero_x,
-                    12.5 + self.cloud1_x,
-                    44.5 + self.cloud1_x):
+                8 + self.hero_x,
+                12 + self.hero_x,
+                12.5 + self.cloud1_x,
+                44.5 + self.cloud1_x,
+            ):
                 self.score += self.hit_score
 
             if self.detect_collision(
-                    8 + self.hero_x,
-                    12 + self.hero_x,
-                    12.5 + self.cloud2_x,
-                    self.cloud2_x + 44.5):
+                8 + self.hero_x,
+                12 + self.hero_x,
+                12.5 + self.cloud2_x,
+                self.cloud2_x + 44.5,
+            ):
                 self.score += self.hit_score
 
     def detect_collision(
@@ -489,7 +498,7 @@ class Pixelation:
         x_l_1: float,  # Leftmost x coordinate for the first object
         x_r_1: float,  # Rightmost x coordinate for the first object
         x_l_2: float,  # Leftmost x coordinate for the second object
-        x_r_2: float   # Rightmost x coordinate for the second object
+        x_r_2: float,  # Rightmost x coordinate for the second object
     ) -> bool:
         """Collision detection algorithm.
 
@@ -599,7 +608,7 @@ class Pixelation:
                 45,
                 50,
                 f"YOUR FINAL SCORE IS {round(100 * self.timer)}",
-                pyxel.frame_count % 16
+                pyxel.frame_count % 16,
             )
 
 
