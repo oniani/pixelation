@@ -1,26 +1,34 @@
 """
-P I X E L A T I O N
+Filename: pixelation.py
+Created: 2019/06/24 06:53:36 AM
+Author: David Oniani
+E-mail: onianidavid@gmail.com
 
-David Oniani
-Licensed under GNU General Public License v3.0
+License:
+    The code is licensed under GNU General Public License v3.0.
+    Please read the LICENSE file in this distribution for details
+    regarding the licensing of this code.
+
+Description:
+    Implementation of a small retro-style game.
+    It uses a retro-style game engine pyxel.
 """
-
 
 # Have to manually disable pylint for this project.
 # Otherwise, get pylint(E1101) warning.
 # Below is the explanation of why it happens
+#
 # NOTE: pyxel initiates an object and binds its methods to the pyxel module.
 #       You canont use these methods until the init function has been called.
 #       This makes a nice API but is not so good for the static analysis.
-
+#
 # pylint: disable-all
-
 
 import time
 import random
 import pyxel
 
-
+# Global variables
 WINDOW_WIDTH = 180
 WINDOW_HEIGHT = 120
 
