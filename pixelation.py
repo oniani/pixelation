@@ -562,7 +562,7 @@ class Pixelation:
             the cases. For instance, in the first case, if we do not impose
             the restriction x_r_1 <= x_r_2, we get the third case.
 
-        NOTE: We could abstract out the third case, but it is
+        NOTE: We could abstract away the third case, but it is
             better to have it this way since the former option
             will needlessly overcomplicate things.
         """
