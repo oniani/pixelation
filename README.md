@@ -1,6 +1,6 @@
 # P I X E L A T I O N
 
-![Pixelation](images/pixelation.png)
+![Pixelation](./images/pixelation.png)
 
 This is a simple retro-style game where you have a hero which roams around
 and tries to avoid getting hit by raging clouds. If you get hit by the cloud,
