@@ -15,11 +15,11 @@ Description:
 """
 
 # Have to manually disable pylint for this project.
-# Otherwise, get pylint(E1101) warning.
+# Otherwise, get pylint (E1101) warning.
 # Below is the explanation of why it happens
 #
 # NOTE: pyxel initiates an object and binds its methods to the pyxel module.
-#       You canont use these methods until the init function has been called.
+#       One canont use these methods until the init function has been called.
 #       This makes a nice API but is not so good for the static analysis.
 #
 # pylint: disable-all
@@ -28,20 +28,20 @@ import time
 import random
 import pyxel
 
-# Global variables
-WINDOW_WIDTH = 180
-WINDOW_HEIGHT = 120
-
-JUMP_HEIGHT = 20
-
-HIT_SCORE = 1
-
 
 class Pixelation:
     """The core class of the game."""
 
+    # Global variables
+    WINDOW_WIDTH = 180
+    WINDOW_HEIGHT = 120
+
+    JUMP_HEIGHT = 20
+
+    HIT_SCORE = 1
+
     def __init__(self) -> None:
-        pyxel.init(WINDOW_WIDTH, WINDOW_HEIGHT, caption="Pixelation")
+        pyxel.init(self.WINDOW_WIDTH, self.WINDOW_HEIGHT, caption="Pixelation")
 
         # Sound settings
 
@@ -112,14 +112,14 @@ class Pixelation:
 
         # Jump variables
         self.velocity = 0  # Increment velocity
-        self.jump_height = JUMP_HEIGHT  # Jump height
+        self.jump_height = self.JUMP_HEIGHT  # Jump height
         self.is_jumping = False  # Variable declaration, for jumping
         self.jump_num = 0  # How many times did it jump?
 
         # Laser beam variables
         self.laser_is_shooting = False  # Are the clouds shooting?
         self.laser_beam_timer = 0  # Laser beam time gap
-        self.hit_score = HIT_SCORE  # Score increment for laser hit
+        self.hit_score = self.HIT_SCORE  # Score increment for laser hit
 
         pyxel.run(self.update, self.draw)  # Run the environment
 
@@ -328,17 +328,17 @@ class Pixelation:
         """
         # Randomization of raindrops for cloud0
         if 40.05 + self.rain0_x / 5 > 70:
-            self.start0 = random.randrange(0, WINDOW_WIDTH + 1)
+            self.start0 = random.randrange(0, self.WINDOW_WIDTH + 1)
             self.end0 = self.start0 + 21
 
         # Randomization of raindrops for cloud1
         if 40.05 + self.rain1_x / 5 > 70:
-            self.start1 = random.randrange(0, WINDOW_WIDTH + 1)
+            self.start1 = random.randrange(0, self.WINDOW_WIDTH + 1)
             self.end1 = self.start1 + 21
 
         # Randomization of raindrops for cloud2
         if 40.05 + self.rain2_x / 5 > 70:
-            self.start2 = random.randrange(0, WINDOW_WIDTH + 1)
+            self.start2 = random.randrange(0, self.WINDOW_WIDTH + 1)
             self.end2 = self.start2 + 21
 
         # Cloud 0 rain
