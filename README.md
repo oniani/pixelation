@@ -67,4 +67,4 @@ $ python3 pixelation.py
 
 ## License
 
-[GNU General Public License v3.0](LICENSE)
+[MIT License](LICENSE)
